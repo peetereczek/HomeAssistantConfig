@@ -1,0 +1,160 @@
+- id: '1601628465190'
+  alias: SpeedTest
+  description: Trigger SpeedTest for your Internet
+  trigger:
+  - platform: time_pattern
+    minutes: /30
+  condition: []
+  action:
+  - service: speedtestdotnet.speedtest
+    data: {}
+  mode: single
+- id: '1601639212345'
+  alias: Car wash notification
+  description: Push notification, that you can wash your car
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.car_wash
+    from: 'off'
+    to: 'on'
+    for: 00:30:00
+  condition: []
+  action:
+  - service: notify.mobile_app_sm_g986b
+    data:
+      title: Car wash
+      message: Możesz dziś umyć samochód :P
+  mode: single
+- id: '1608056872531'
+  alias: Powiadomienie z alarmu
+  description: Powiadomienie o alarmie w domu gdy jesteś daleko
+  trigger:
+  - platform: state
+    entity_id: alarm_control_panel.home_alarm
+    to: triggered
+  condition: []
+  action:
+  - service: notify.notify
+    data:
+      title: ALARM!
+      message: Alarm w domu!
+  - service: persistent_notification.create
+    data:
+      title: ALARM!
+      message: Alarm w domu!
+  mode: single
+- id: '1608478680935'
+  alias: Trigger alarm
+  description: Triggerowanie alarmu z czujników
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.door
+    from: 'off'
+    to: 'on'
+  condition:
+  - condition: or
+    conditions:
+    - condition: state
+      entity_id: alarm_control_panel.home_alarm
+      state: armed_away
+    - condition: state
+      entity_id: alarm_control_panel.home_alarm
+      state: armed_night
+  action:
+  - service: alarm_control_panel.alarm_trigger
+    data: {}
+    entity_id: alarm_control_panel.home_alarm
+  mode: single
+- id: '1608557053776'
+  alias: Set thermostats, while away
+  description: Ustawia niską temperaturę ogrzewania w sezonie
+  trigger:
+  - platform: state
+    entity_id: alarm_control_panel.home_alarm
+    to: armed_away
+  condition:
+  - condition: state
+    entity_id: input_boolean.sezon_grzewczy
+    state: 'on'
+  action:
+  - service: automation.turn_off
+    data: {}
+    entity_id: automation.thermostat_schedule
+  - service: script.heating_away
+    data: {}
+  mode: single
+- id: '1608557090825'
+  alias: Set thermostats, while home
+  description: Ustawia wyższą temperaturę ogrzewania w sezonie
+  trigger:
+  - platform: state
+    entity_id: alarm_control_panel.home_alarm
+    to: disarmed
+  condition:
+  - condition: state
+    entity_id: input_boolean.sezon_grzewczy
+    state: 'on'
+  action:
+  - service: automation.turn_on
+    data: {}
+    entity_id: automation.thermostat_schedule
+  mode: single
+- id: '1608560967768'
+  alias: Thermostat schedule
+  description: Skrypt z rozkładem ogrzewania
+  trigger:
+  - platform: time_pattern
+    minutes: /10
+    seconds: '00'
+  - platform: homeassistant
+    event: start
+  condition:
+  - condition: state
+    entity_id: input_boolean.sezon_grzewczy
+    state: 'on'
+  action:
+  - service: python_script.thermostat_scheduler
+    data: {}
+  mode: single
+- id: '1608634414829'
+  alias: Sezon grzewczy ON
+  description: Włączenie kaloryferów
+  trigger:
+  - platform: state
+    entity_id: input_boolean.sezon_grzewczy
+    from: 'off'
+    to: 'on'
+  condition: []
+  action:
+  - service: climate.set_hvac_mode
+    data:
+      entity_id: climate.bf87b397ec02c5a554ywfj
+      hvac_mode: auto
+    entity_id: climate.bf87b397ec02c5a554ywfj
+  - service: climate.set_hvac_mode
+    data:
+      entity_id: climate.bf859bbe3ceddf4c11t0qe
+      hvac_mode: auto
+    entity_id: climate.bf859bbe3ceddf4c11t0qe
+  mode: single
+- id: '1608634442526'
+  alias: Sezon grzewczy OFF
+  description: Wyłączenie kaloryferów
+  trigger:
+  - platform: state
+    entity_id: input_boolean.sezon_grzewczy
+    from: 'on'
+    to: 'off'
+  condition: []
+  action:
+  - service: climate.set_hvac_mode
+    data:
+      entity_id: climate.bf87b397ec02c5a554ywfj
+      hvac_mode: 'off'
+    entity_id: climate.bf87b397ec02c5a554ywfj
+  - service: climate.set_hvac_mode
+    data:
+      entity_id: climate.bf859bbe3ceddf4c11t0qe
+      hvac_mode: 'off'
+    entity_id: climate.bf859bbe3ceddf4c11t0qe
+  mode: single

@@ -1,0 +1,33 @@
+sensor.asuswrt_devices_connected:
+  friendly_name: Asus Devices Connected
+  icon: mdi:router-network
+sensor.asuswrt_download_speed: {}
+sensor.asuswrt_upload_speed: {}
+sensor.asuswrt_download:
+  icon: mdi:cloud-download
+sensor.asuswrt_upload:
+  icon: mdi:cloud-upload
+sensor.ztm_10_from_6027_04:
+  friendly_name: 10 z Popiela 04
+sensor.ztm_33_from_6027_04:
+  friendly_name: 33 z Popiela 04
+sensor.ztm_10_from_6026_03:
+  friendly_name: 10 z Bogusławskiego 03
+sensor.ztm_33_from_6026_03:
+  friendly_name: 33 z Bogusławskiego 03
+device_tracker.desktop_sl4jjvt:
+  icon: mdi:laptop-windows
+device_tracker.laptop_u01tu3ju:
+  icon: mdi:laptop-windows
+zone.home:
+  radius: 65
+device_tracker.skipper_mobile:
+  entity_picture: local/piotr.jpg
+sensor.looko2_ijpdescription:
+  friendly_name: Opis
+light.living_room_rgb:
+  friendly_name: Salon RGB
+binary_sensor.ping_tuya_motion_sensor_door:
+  icon: mdi:door-open
+device_tracker.iphone_uli_3:
+  entity_picture: local/ula.jpg

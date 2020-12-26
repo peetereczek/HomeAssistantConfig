@@ -1,0 +1,34 @@
+heating_away:
+  alias: Heating away
+  sequence:
+  - service: climate.set_temperature
+    data:
+      entity_id: climate.bf87b397ec02c5a554ywfj
+      hvac_mode: auto
+      temperature: 15
+    entity_id: climate.bf87b397ec02c5a554ywfj
+  - service: climate.set_temperature
+    data:
+      entity_id: climate.bf859bbe3ceddf4c11t0qe
+      hvac_mode: auto
+      temperature: 15
+    entity_id: climate.bf859bbe3ceddf4c11t0qe
+  mode: single
+  icon: mdi:radiator-disabled
+heating_home:
+  alias: Heating home
+  sequence:
+  - service: climate.set_temperature
+    data:
+      entity_id: climate.bf87b397ec02c5a554ywfj
+      hvac_mode: auto
+      temperature: 20
+    entity_id: climate.bf87b397ec02c5a554ywfj
+  - service: climate.set_temperature
+    data:
+      entity_id: climate.bf859bbe3ceddf4c11t0qe
+      hvac_mode: auto
+      temperature: 20
+    entity_id: climate.bf859bbe3ceddf4c11t0qe
+  mode: single
+  icon: mdi:radiator

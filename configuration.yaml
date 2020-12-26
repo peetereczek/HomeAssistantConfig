@@ -1,0 +1,185 @@
+
+# Configure a default setup of Home Assistant (frontend, api, etc)
+default_config:
+
+homeassistant:
+  customize: !include customize.yaml
+frontend:
+  themes: !include_dir_merge_named themes
+python_script:
+
+#panel_custom:
+#  - name: floorplan
+#    sidebar_title: Plan
+#    sidebar_icon: mdi:home-modern
+#    url_path: floorplan
+#    config: !include floorplan.yaml
+
+# Text to speech
+tts:
+  - platform: google_translate
+
+group: !include groups.yaml
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+
+asuswrt:
+  host: 192.168.50.1
+  port: 1025
+  protocol: ssh
+  username: !secret login
+  password: !secret passwd1
+  sensors:
+    - devices
+    - upload
+    - download
+    - upload_speed
+    - download_speed
+
+media_player:
+  - platform: samsungtv_tizen
+    host: 192.168.50.21
+    mac: !secret tv_mac
+    app_list: '{"YouTube": "111299001912", "HBO GO": "3201706012478", "Prime Video": "3201512006785"}'
+    is_frame_tv: True
+
+binary_sensor:
+  - platform: car_wash
+    weather: weather.wolczynska
+  - platform: template
+    sensors:
+      door:
+        device_class: opening
+        value_template: "{{ is_state('device_tracker.esp_57981c', 'home') }}"
+        icon_template: >-
+          {% if is_state("device_tracker.esp_57981c", "home") %}
+            mdi:door-open
+          {% else %}
+            mdi:door
+          {% endif %}
+
+sonoff:
+  username: !secret hamail
+  password: !secret haintegration
+
+light:
+  - platform: group
+    name: Living Room RGB
+    entities:
+      - light.sonoff_1000ee217a
+      - light.sonoff_1000f44d8b
+
+alarm_control_panel:
+  - platform: manual
+    name: Home Alarm
+    arming_time: 30
+    delay_time: 2
+    trigger_time: 60
+
+sensor:
+  - platform: mitemp_bt
+  - platform: uptime
+  - platform: version
+  - platform: systemmonitor
+    resources:
+      - type: disk_use_percent
+        arg: /home
+      - type: memory_use_percent
+      - type: processor_use
+      - type: ipv4_address
+        arg: eth0
+      - type: last_boot
+  - platform: command_line
+    name: Raspberry Pi Temp
+    command: "cat /sys/class/thermal/thermal_zone0/temp"
+    unit_of_measurement: "°C"
+    value_template: '{{ value | multiply(0.001) | round(2) }}'
+  - platform: yahoofinance
+    symbols:
+      - ^DJI
+      - CL=F
+      - GC=F
+      - AMZN
+      - GOOGL
+      - MSFT
+      - AAPL
+      - 005930.KS
+      - PLN=X
+      - EUR=X
+      - BTC-USD
+    scan_interval:
+      hours: 4
+    show_trending_icon: true
+  - platform: template
+    sensors:
+      termostat_1_error:
+        friendly_name: "Temperature 1 error"
+        unit_of_measurement: '°C'
+        value_template: "{{(state_attr('climate.bf87b397ec02c5a554ywfj','current_temperature') | float - state_attr('sensor.mi_t_582d34388e86','mean') | float) | round(1) }}"
+      termostat_1_temp:
+        friendly_name: "Termostat 1 temp"
+        unit_of_measurement: '°C'
+        value_template: >-
+                {{ state_attr('climate.bf87b397ec02c5a554ywfj', 'current_temperature') }}
+      termostat_2_temp:
+        friendly_name: "Termostat 2 temp"
+        unit_of_measurement: '°C'
+        value_template: >-
+                {{ state_attr('climate.bf859bbe3ceddf4c11t0qe', 'current_temperature') }}
+  - platform: template
+    sensors:
+      battery_mi1:
+        friendly_name: "Battery MiTemp 1"
+        unit_of_measurement: '%'
+        value_template: >-
+                {{ state_attr('sensor.mi_t_582d34388d0f', 'battery_level')|round }}
+        device_class: battery
+  - platform: template
+    sensors:
+      battery_mi2:
+        friendly_name: "Battery MiTemp 2"
+        unit_of_measurement: '%'
+        value_template: >-
+                {{ state_attr('sensor.mi_t_582d34388e86', 'battery_level')|round }}
+        device_class: battery
+  - platform: looko2
+    api_key: !secret looko2
+    name: LookO2
+    station_id: 'A020A603680A'
+    monitored_conditions:
+      - 'AverageHCHO'
+      - 'AveragePM1'
+      - 'AveragePM10'
+      - 'AveragePM25'
+      - 'Color'
+      - 'HCHO'
+      - 'Humidity'
+      - 'IJP'
+      - 'IJPDescription'
+      - 'IJPDescriptionEN'
+      - 'IJPString'
+      - 'IJPStringEN'
+      - 'Indoor'
+      - 'PM1'
+      - 'PM10'
+      - 'PM25'
+      - 'PreviousIJP'
+      - 'Temperature'
+    scan_interval:
+      minutes: 20
+  - platform: ztm
+    api_key: !secret ztm_api
+    lines:
+      - number: 10
+        stop_id: 6027
+        stop_number: "04"
+      - number: 33
+        stop_id: 6027
+        stop_number: "04"
+      - number: 10
+        stop_id: 6026
+        stop_number: "03"
+      - number: 33
+        stop_id: 6026
+        stop_number: "03"
