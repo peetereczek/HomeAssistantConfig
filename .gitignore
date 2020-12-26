@@ -5,11 +5,15 @@
 .storage
 .cloud
 .google.token
+ssh
 
 # Ignore files.
 ip_bans.yaml
 secrets.yaml
 known_devices.yaml
+aircast.xml
+.sonoff.json
+.shopping_list.json
 *.log
 *.db
 *.db.*
