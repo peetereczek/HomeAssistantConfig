@@ -31,3 +31,15 @@ binary_sensor.ping_tuya_motion_sensor_door:
   icon: mdi:door-open
 device_tracker.iphone_uli_3:
   entity_picture: local/ula.jpg
+calendar.garbage_collection:
+  icon: mdi:trash-can
+sensor.workday_description:
+  templates:
+    icon_color: 'if (state === ''on'') return ''rgb(134,188,37)''; return ''var(--paper-item-icon-active-color)'';
+
+      '
+binary_sensor.workday_sensor:
+  templates:
+    icon_color: if (state === 'on') return 'rgb(134,188,37)'; return 'var(--paper-item-icon-active-color)';
+binary_sensor.window:
+  friendly_name: Balkon

@@ -45,23 +45,29 @@ media_player:
     is_frame_tv: True
 
 binary_sensor:
+  - platform: workday
+    country: PL
   - platform: car_wash
     weather: weather.wolczynska
   - platform: template
     sensors:
-      door:
+      window:
         device_class: opening
         value_template: "{{ is_state('device_tracker.esp_57981c', 'home') }}"
         icon_template: >-
           {% if is_state("device_tracker.esp_57981c", "home") %}
-            mdi:door-open
+            mdi:window-open-variant
           {% else %}
-            mdi:door
+            mdi:window-closed-variant
           {% endif %}
-
 sonoff:
   username: !secret hamail
   password: !secret haintegration
+
+ble_monitor:
+    devices:
+        - mac: 'A4:C1:38:47:06:3C'
+          encryption_key: 'c4363fabc4cad597703e311d844e8377'
 
 light:
   - platform: group
@@ -73,12 +79,26 @@ light:
 alarm_control_panel:
   - platform: manual
     name: Home Alarm
-    arming_time: 30
+    arming_time: 5
     delay_time: 2
     trigger_time: 60
 
+yahoofinance:
+  symbols:
+    - ^DJI
+    - CL=F
+    - GC=F
+    - AMZN
+    - GOOGL
+    - MSFT
+    - AAPL
+    - 005930.KS
+    - PLN=X
+    - EUR=X
+    - BTC-USD
+  show_trending_icon: true
+
 sensor:
-  - platform: mitemp_bt
   - platform: uptime
   - platform: version
   - platform: systemmonitor
@@ -95,28 +115,18 @@ sensor:
     command: "cat /sys/class/thermal/thermal_zone0/temp"
     unit_of_measurement: "°C"
     value_template: '{{ value | multiply(0.001) | round(2) }}'
-  - platform: yahoofinance
-    symbols:
-      - ^DJI
-      - CL=F
-      - GC=F
-      - AMZN
-      - GOOGL
-      - MSFT
-      - AAPL
-      - 005930.KS
-      - PLN=X
-      - EUR=X
-      - BTC-USD
     scan_interval:
       hours: 4
-    show_trending_icon: true
   - platform: template
     sensors:
       termostat_1_error:
         friendly_name: "Temperature 1 error"
         unit_of_measurement: '°C'
-        value_template: "{{(state_attr('climate.bf87b397ec02c5a554ywfj','current_temperature') | float - state_attr('sensor.mi_t_582d34388e86','mean') | float) | round(1) }}"
+        value_template: "{{(state_attr('climate.bf87b397ec02c5a554ywfj','current_temperature') | float - state_attr('sensor.ble_temperature_582d34388e86','mean') | float) | round(1) }}"
+      termostat_2_error:
+        friendly_name: "Temperature 2 error"
+        unit_of_measurement: '°C'
+        value_template: "{{(state_attr('climate.bf859bbe3ceddf4c11t0qe','current_temperature') | float - state_attr('sensor.ble_temperature_a4c13847063c','mean') | float) | round(1) }}"
       termostat_1_temp:
         friendly_name: "Termostat 1 temp"
         unit_of_measurement: '°C'
@@ -127,13 +137,18 @@ sensor:
         unit_of_measurement: '°C'
         value_template: >-
                 {{ state_attr('climate.bf859bbe3ceddf4c11t0qe', 'current_temperature') }}
+      termostat_3_temp:
+        friendly_name: "Termostat 3 temp"
+        unit_of_measurement: '°C'
+        value_template: >-
+                {{ state_attr('climate.bfedbbe72bb7a3d9bcvav6', 'current_temperature') }}
   - platform: template
     sensors:
       battery_mi1:
         friendly_name: "Battery MiTemp 1"
         unit_of_measurement: '%'
         value_template: >-
-                {{ state_attr('sensor.mi_t_582d34388d0f', 'battery_level')|round }}
+                {{ state_attr('sensor.ble_temperature_582d34388d0f', 'battery_level')|round }}
         device_class: battery
   - platform: template
     sensors:
@@ -141,8 +156,32 @@ sensor:
         friendly_name: "Battery MiTemp 2"
         unit_of_measurement: '%'
         value_template: >-
-                {{ state_attr('sensor.mi_t_582d34388e86', 'battery_level')|round }}
+                {{ state_attr('sensor.ble_temperature_582d34388e86', 'battery_level')|round }}
         device_class: battery
+  - platform: template
+    sensors:
+      battery_mi3:
+        friendly_name: "Battery MiTemp 3"
+        unit_of_measurement: '%'
+        value_template: >-
+                {{ state_attr('sensor.ble_temperature_a4c13847063c', 'battery_level')|round }}
+        device_class: battery
+  - platform: template
+    sensors:
+      workday_description:
+        friendly_name: "Czy dziś praca?"
+        value_template: >-
+          {% if is_state("binary_sensor.workday_sensor","on") %}
+            Dziś jest dzień pracujący.
+          {% else %}
+            Dziś jest dzień wolny.
+          {% endif %}
+        icon_template: >-
+          {% if is_state("binary_sensor.workday_sensor","on") %}
+            mdi:briefcase-account-outline
+          {% else %}
+            mdi:emoticon-outline
+          {% endif %}
   - platform: looko2
     api_key: !secret looko2
     name: LookO2

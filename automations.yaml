@@ -44,22 +44,25 @@
       message: Alarm w domu!
   mode: single
 - id: '1608478680935'
-  alias: Trigger alarm
+  alias: Trigger alarm (AWAY)
   description: Triggerowanie alarmu z czujników
   trigger:
   - platform: state
-    entity_id: binary_sensor.door
+    entity_id: binary_sensor.0x158d000580336b_contact
+    from: 'off'
+    to: 'on'
+  - platform: state
+    entity_id: binary_sensor.0x158d00062f8d04_motion
+    from: 'off'
+    to: 'on'
+  - platform: state
+    entity_id: binary_sensor.0x158d0005890dbf_motion
     from: 'off'
     to: 'on'
   condition:
-  - condition: or
-    conditions:
-    - condition: state
-      entity_id: alarm_control_panel.home_alarm
-      state: armed_away
-    - condition: state
-      entity_id: alarm_control_panel.home_alarm
-      state: armed_night
+  - condition: state
+    entity_id: alarm_control_panel.home_alarm
+    state: armed_away
   action:
   - service: alarm_control_panel.alarm_trigger
     data: {}
@@ -157,4 +160,91 @@
       entity_id: climate.bf859bbe3ceddf4c11t0qe
       hvac_mode: 'off'
     entity_id: climate.bf859bbe3ceddf4c11t0qe
+  mode: single
+- id: '1610048949961'
+  alias: Wyłącz ogrzewanie bo okno
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.window
+    from: 'off'
+    to: 'on'
+    for: 00:00:30
+  condition: []
+  action:
+  - service: automation.turn_off
+    data:
+      entity_id: automation.thermostat_schedule
+  - service: climate.set_temperature
+    data:
+      entity_id: climate.bf87b397ec02c5a554ywfj
+      hvac_mode: auto
+      temperature: 15
+    entity_id: climate.bf87b397ec02c5a554ywfj
+  mode: single
+- id: '1610049167719'
+  alias: Włącz ogrzewanie bo okno
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.window
+    from: 'on'
+    to: 'off'
+  condition: []
+  action:
+  - service: automation.turn_on
+    data:
+      entity_id: automation.thermostat_schedule
+  mode: single
+- id: '1610049420662'
+  alias: Trigger alarm (NIGHT)
+  description: Triggerowanie alarmu z czujników
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.0x158d000580336b_contact
+    from: 'off'
+    to: 'on'
+  condition:
+  - condition: state
+    entity_id: alarm_control_panel.home_alarm
+    state: armed_night
+  action:
+  - service: alarm_control_panel.alarm_trigger
+    data: {}
+    entity_id: alarm_control_panel.home_alarm
+  mode: single
+- id: '1610054777017'
+  alias: Zamknij drzwi
+  description: Przypomnienie o otwartych drzwiach
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.0x158d000580336b_contact
+    from: 'off'
+    to: 'on'
+    for: 00:01:00
+  condition: []
+  action:
+  - service: notify.notify
+    data:
+      title: DRZWI!
+      message: Zamknij za sobą drzwi!
+  mode: single
+- id: '1610055061956'
+  alias: Zamknij balkon
+  description: Przypomnienie o otwartych drzwiach balkonowych
+  trigger:
+  - platform: state
+    from: 'off'
+    to: 'on'
+    for: 00:05:00
+    entity_id: binary_sensor.window
+  condition:
+  - condition: numeric_state
+    entity_id: sensor.ble_temperature_582d34388d0f
+    below: '15'
+  action:
+  - service: notify.mobile_app_sm_g986b
+    data:
+      title: BALKON!
+      message: Nie za dużo tego wietrzenia?
   mode: single
