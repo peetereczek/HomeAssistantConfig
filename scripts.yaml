@@ -13,6 +13,12 @@ heating_away:
       hvac_mode: auto
       temperature: 15
     entity_id: climate.bf859bbe3ceddf4c11t0qe
+  - service: climate.set_temperature
+    data:
+      entity_id: climate.bfedbbe72bb7a3d9bcvav6
+      hvac_mode: auto
+      temperature: 15
+    entity_id: climate.bfedbbe72bb7a3d9bcvav6
   mode: single
   icon: mdi:radiator-disabled
 heating_home:
@@ -22,13 +28,19 @@ heating_home:
     data:
       entity_id: climate.bf87b397ec02c5a554ywfj
       hvac_mode: auto
-      temperature: 20
+      temperature: 19
     entity_id: climate.bf87b397ec02c5a554ywfj
   - service: climate.set_temperature
     data:
       entity_id: climate.bf859bbe3ceddf4c11t0qe
       hvac_mode: auto
-      temperature: 20
+      temperature: 19
     entity_id: climate.bf859bbe3ceddf4c11t0qe
+  - service: climate.set_temperature
+    data:
+      entity_id: climate.bfedbbe72bb7a3d9bcvav6
+      hvac_mode: auto
+      temperature: 19
+    entity_id: climate.bfedbbe72bb7a3d9bcvav6
   mode: single
   icon: mdi:radiator

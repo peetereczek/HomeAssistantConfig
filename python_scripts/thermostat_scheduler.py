@@ -7,13 +7,15 @@ WEEKEND_SCHEDULE = [
     [datetime.time(18, 0), datetime.time(23, 59, 59)]
 ]
 
-TEMP_HIGH = 19.0
-TEMP_LOW  = 17.0
+TEMP_HIGH = 18.5
+TEMP_LOW  = 16.5
 
 climate_entity_1 = 'climate.bf87b397ec02c5a554ywfj' # set to your thermostat entity
 climate_entity_2 = 'climate.bf859bbe3ceddf4c11t0qe'
+climate_entity_3 = 'climate.bfedbbe72bb7a3d9bcvav6'
 current_temp_1 = hass.states.get(climate_entity_1).attributes['temperature']
 current_temp_2 = hass.states.get(climate_entity_2).attributes['temperature']
+current_temp_3 = hass.states.get(climate_entity_3).attributes['temperature']
 
 now = datetime.datetime.now().time()
 if datetime.datetime.now().date().weekday() < 5:
@@ -39,3 +41,5 @@ if new_temp != current_temp_1:
         'message': 'Zmiana temperatury na {} (było {})'.format(new_temp, current_temp_1)})
 if new_temp != current_temp_2:
     hass.services.call('climate', 'set_temperature', {'entity_id': climate_entity_2, 'temperature': new_temp})
+if new_temp != current_temp_3:
+    hass.services.call('climate', 'set_temperature', {'entity_id': climate_entity_3, 'temperature': new_temp})
