@@ -1,0 +1,98 @@
+type: 'custom:button-card'
+entity: sensor.raspberry_pi_temp
+icon: 'mdi:raspberry-pi'
+aspect_ratio: 3/2
+name: Raspberry Pi 4B
+styles:
+  card:
+    - border-radius: 1%
+    - padding: 5%
+    - font-size: 18px
+    - text-transform: capitalize
+    - background-color: null
+    - color: '--primary-text-color'
+  grid:
+    - grid-template-areas: '"i temp" "n n" "cpu cpu" "ram ram" "sd sd" "ip ip"'
+    - grid-template-columns: 1fr 1fr
+    - grid-template-rows: 1fr min-content min-content min-content min-content
+  name:
+    - font-weight: bold
+    - font-size: 26px
+    - color: '--primary-text-color'
+    - align-self: middle
+    - justify-self: start
+    - padding-bottom: 4px
+  img_cell:
+    - justify-content: start
+    - align-items: start
+    - margin: none
+  icon:
+    - color: |
+        [[[
+          if (entity.state < 50) return 'lime';
+          if (entity.state >= 50 && entity.state < 70) return 'orange';
+          else return 'red';
+        ]]]
+    - width: 70%
+    - margin-top: '-5%'
+  custom_fields:
+    temp:
+      - align-self: start
+      - justify-self: end
+    cpu:
+      - padding-bottom: 2px
+      - align-self: middle
+      - justify-self: start
+      - '--text-color-sensor': '[[[ if (states["sensor.processor_use"].state > 80) return "red"; ]]]'
+    ram:
+      - padding-bottom: 2px
+      - align-self: middle
+      - justify-self: start
+      - '--text-color-sensor': >-
+          [[[ if (states["sensor.memory_use_percent"].state > 80) return "red";
+          ]]]
+    sd:
+      - align-self: middle
+      - justify-self: start
+      - '--text-color-sensor': >-
+          [[[ if (states["sensor.disk_use_percent_home"].state > 70) return
+          "red"; ]]]
+    ip:
+      - align-self: middle
+      - justify-self: start
+custom_fields:
+  temp: |
+    [[[
+      return `<ha-icon
+        icon="mdi:thermometer"
+        style="width: 50px; height: 50px; color: #fdd835;">
+        </ha-icon><span>${entity.state}°C</span>`
+    ]]]
+  cpu: |
+    [[[
+      return `<ha-icon
+        icon="mdi:cpu-32-bit"
+        style="width: 24px; height: 24px; color: var(--paper-item-icon-color);">
+        </ha-icon><span> CPU: <span>${states['sensor.processor_use'].state}%</span></span>`
+    ]]]
+  ram: |
+    [[[
+      return `<ha-icon
+        icon="mdi:memory"
+        style="width: 24px; height: 24px; color: var(--paper-item-icon-color);">
+        </ha-icon><span> RAM: <span>${states['sensor.memory_use_percent'].state}%</span></span>`
+    ]]]
+  sd: |
+    [[[
+      return `<ha-icon
+        icon="mdi:harddisk"
+        style="width: 24px; height: 24px; color: var(--paper-item-icon-color);">
+        </ha-icon><span> SD: <span>${states['sensor.disk_use_percent_home'].state}%</span></span>`
+    ]]]
+  ip: |
+    [[[
+      return `<ha-icon
+        icon="mdi:ip-network"
+        style="width: 24px; height: 24px; color: var(--paper-item-icon-color);">
+        </ha-icon><span> IP: <span>${states['sensor.ipv4_address_eth0'].state}</span></span>`
+    ]]]
