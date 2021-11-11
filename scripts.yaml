@@ -3,22 +3,25 @@ heating_away:
   sequence:
   - service: climate.set_temperature
     data:
-      entity_id: climate.bf87b397ec02c5a554ywfj
-      hvac_mode: auto
+      hvac_mode: heat
       temperature: 15
-    entity_id: climate.bf87b397ec02c5a554ywfj
+    target:
+      entity_id:
+      - climate.lazienka
   - service: climate.set_temperature
     data:
-      entity_id: climate.bf859bbe3ceddf4c11t0qe
-      hvac_mode: auto
+      hvac_mode: heat
       temperature: 15
-    entity_id: climate.bf859bbe3ceddf4c11t0qe
+    target:
+      entity_id:
+      - climate.salon
   - service: climate.set_temperature
     data:
-      entity_id: climate.bfedbbe72bb7a3d9bcvav6
-      hvac_mode: auto
+      hvac_mode: heat
       temperature: 15
-    entity_id: climate.bfedbbe72bb7a3d9bcvav6
+    target:
+      entity_id:
+      - climate.sypialnia
   mode: single
   icon: mdi:radiator-disabled
 heating_home:
@@ -26,21 +29,100 @@ heating_home:
   sequence:
   - service: climate.set_temperature
     data:
-      entity_id: climate.bf87b397ec02c5a554ywfj
-      hvac_mode: auto
+      hvac_mode: heat
       temperature: 19
-    entity_id: climate.bf87b397ec02c5a554ywfj
+    target:
+      entity_id:
+      - climate.lazienka
   - service: climate.set_temperature
     data:
-      entity_id: climate.bf859bbe3ceddf4c11t0qe
-      hvac_mode: auto
+      hvac_mode: heat
       temperature: 19
-    entity_id: climate.bf859bbe3ceddf4c11t0qe
+    target:
+      entity_id:
+      - climate.salon
   - service: climate.set_temperature
     data:
-      entity_id: climate.bfedbbe72bb7a3d9bcvav6
-      hvac_mode: auto
+      hvac_mode: heat
       temperature: 19
-    entity_id: climate.bfedbbe72bb7a3d9bcvav6
+    target:
+      entity_id:
+      - climate.sypialnia
   mode: single
   icon: mdi:radiator
+xiaomi_fan_speed_1:
+  alias: Xiaomi Fan Speed 1
+  sequence:
+  - service: fan.set_speed
+    data:
+      speed: low
+    target:
+      entity_id: fan.mi_air_purifier_3_3h
+  mode: single
+  icon: mdi:fan-speed-1
+xiaomi_fan_speed_2:
+  alias: Xiaomi Fan Speed 2
+  sequence:
+  - service: fan.set_speed
+    target:
+      entity_id: fan.mi_air_purifier_3_3h
+    data:
+      speed: medium
+  mode: single
+  icon: mdi:fan-speed-2
+xiaomi_fan_speed_3:
+  alias: Xiaomi Fan Speed 3
+  sequence:
+  - service: fan.set_speed
+    data:
+      speed: high
+    target:
+      entity_id: fan.mi_air_purifier_3_3h
+  mode: single
+  icon: mdi:fan-speed-3
+xiaomi_fan_auto:
+  alias: Xiaomi Fan Auto
+  sequence:
+  - service: fan.set_preset_mode
+    data:
+      preset_mode: Auto
+    target:
+      entity_id:
+      - fan.mi_air_purifier_3_3h
+  mode: single
+  icon: mdi:power-cycle
+xiaomi_fan_silent:
+  alias: Xiaomi Fan Silent
+  sequence:
+  - service: fan.set_preset_mode
+    target:
+      entity_id:
+      - fan.mi_air_purifier_3_3h
+    data:
+      preset_mode: Silent
+  mode: single
+  icon: mdi:weather-night
+turn_the_alarm:
+  alias: Turn the alarm (away)
+  sequence:
+  - service: alarm_control_panel.alarm_arm_away
+    target:
+      entity_id: alarm_control_panel.home_alarm
+  mode: single
+  icon: mdi:shield-home
+alarm_off:
+  sequence:
+  - service: alarm_control_panel.alarm_disarm
+    target:
+      entity_id: alarm_control_panel.home_alarm
+  mode: single
+  alias: Alarm off
+  icon: mdi:shield-remove
+turn_the_alarm_night:
+  alias: Turn the alarm (night)
+  sequence:
+  - service: alarm_control_panel.alarm_arm_night
+    target:
+      entity_id: alarm_control_panel.home_alarm
+  mode: single
+  icon: mdi:shield-home-outline

@@ -1,5 +1,5 @@
 - id: '1601628465190'
-  alias: SpeedTest
+  alias: '[general] SpeedTest'
   description: Trigger SpeedTest for your Internet
   trigger:
   - platform: time_pattern
@@ -10,7 +10,7 @@
     data: {}
   mode: single
 - id: '1601639212345'
-  alias: Car wash notification
+  alias: '[general] Car wash notification'
   description: Push notification, that you can wash your car
   trigger:
   - platform: state
@@ -20,13 +20,13 @@
     for: 00:30:00
   condition: []
   action:
-  - service: notify.mobile_app_sm_g986b
+  - service: notify.mobile_app_sm_n975f
     data:
+      message: Możesz dziś umyć samochód :)
       title: Car wash
-      message: Możesz dziś umyć samochód :P
   mode: single
 - id: '1608056872531'
-  alias: Powiadomienie z alarmu
+  alias: '[alarm] Powiadomienie z alarmu'
   description: Powiadomienie o alarmie w domu gdy jesteś daleko
   trigger:
   - platform: state
@@ -44,7 +44,7 @@
       message: Alarm w domu!
   mode: single
 - id: '1608478680935'
-  alias: Trigger alarm (AWAY)
+  alias: '[alarm] Trigger alarm (AWAY)'
   description: Triggerowanie alarmu z czujników
   trigger:
   - platform: state
@@ -59,6 +59,18 @@
     entity_id: binary_sensor.0x158d0005890dbf_motion
     from: 'off'
     to: 'on'
+  - platform: state
+    entity_id: binary_sensor.0x158d00070b060e_contact
+    from: 'off'
+    to: 'on'
+  - platform: state
+    entity_id: binary_sensor.0x158d00071172c2_contact
+    from: 'off'
+    to: 'on'
+  - platform: state
+    entity_id: binary_sensor.0x158d00070b0d48_contact
+    from: 'off'
+    to: 'on'
   condition:
   - condition: state
     entity_id: alarm_control_panel.home_alarm
@@ -69,7 +81,7 @@
     entity_id: alarm_control_panel.home_alarm
   mode: single
 - id: '1608557053776'
-  alias: Set thermostats, while away
+  alias: '[climate] Set thermostats, while away'
   description: Ustawia niską temperaturę ogrzewania w sezonie
   trigger:
   - platform: state
@@ -87,7 +99,7 @@
     data: {}
   mode: single
 - id: '1608557090825'
-  alias: Set thermostats, while home
+  alias: '[climate] Set thermostats, while home'
   description: Ustawia wyższą temperaturę ogrzewania w sezonie
   trigger:
   - platform: state
@@ -103,7 +115,7 @@
     entity_id: automation.thermostat_schedule
   mode: single
 - id: '1608560967768'
-  alias: Thermostat schedule
+  alias: '[climate] Thermostat schedule'
   description: Skrypt z rozkładem ogrzewania
   trigger:
   - platform: time_pattern
@@ -120,7 +132,7 @@
     data: {}
   mode: single
 - id: '1608634414829'
-  alias: Sezon grzewczy ON
+  alias: '[climate] Sezon grzewczy ON'
   description: Włączenie kaloryferów
   trigger:
   - platform: state
@@ -141,7 +153,7 @@
     entity_id: climate.bf859bbe3ceddf4c11t0qe
   mode: single
 - id: '1608634442526'
-  alias: Sezon grzewczy OFF
+  alias: '[climate] Sezon grzewczy OFF'
   description: Wyłączenie kaloryferów
   trigger:
   - platform: state
@@ -162,7 +174,7 @@
     entity_id: climate.bf859bbe3ceddf4c11t0qe
   mode: single
 - id: '1610048949961'
-  alias: Wyłącz ogrzewanie bo okno
+  alias: '[climate] Wyłącz ogrzewanie bo okno'
   description: ''
   trigger:
   - platform: state
@@ -183,7 +195,7 @@
     entity_id: climate.bf87b397ec02c5a554ywfj
   mode: single
 - id: '1610049167719'
-  alias: Włącz ogrzewanie bo okno
+  alias: '[climate] Włącz ogrzewanie bo okno'
   description: ''
   trigger:
   - platform: state
@@ -197,7 +209,7 @@
       entity_id: automation.thermostat_schedule
   mode: single
 - id: '1610049420662'
-  alias: Trigger alarm (NIGHT)
+  alias: '[alarm] Trigger alarm (NIGHT)'
   description: Triggerowanie alarmu z czujników
   trigger:
   - platform: state
@@ -214,7 +226,7 @@
     entity_id: alarm_control_panel.home_alarm
   mode: single
 - id: '1610054777017'
-  alias: Zamknij drzwi
+  alias: '[alarm] Zamknij drzwi'
   description: Przypomnienie o otwartych drzwiach
   trigger:
   - platform: state
@@ -230,7 +242,7 @@
       message: Zamknij za sobą drzwi!
   mode: single
 - id: '1610055061956'
-  alias: Zamknij balkon
+  alias: '[climate] Zamknij balkon bo zimno'
   description: Przypomnienie o otwartych drzwiach balkonowych
   trigger:
   - platform: state
@@ -243,8 +255,152 @@
     entity_id: sensor.ble_temperature_582d34388d0f
     below: '15'
   action:
-  - service: notify.mobile_app_sm_g986b
+  - service: notify.mobile_app_sm_n975f
     data:
-      title: BALKON!
-      message: Nie za dużo tego wietrzenia?
+      message: Balkon
+      title: Zamknij balkon!
+  mode: single
+- id: '1610377241972'
+  alias: '[lights] Za ciemno do pracy'
+  description: Zielone biurko do pracy
+  trigger:
+  - platform: sun
+    event: sunset
+  condition:
+  - condition: state
+    entity_id: device_tracker.plpjarmoszko03_2
+    state: home
+  action:
+  - service: light.turn_on
+    data:
+      color_name: green
+    target:
+      device_id: cb86daddd38c338bfb2d5814f42400c1
+  - service: light.turn_on
+    target:
+      device_id: bcf90c079247b3e877a670c465c1815c
+  mode: single
+- id: '1611317536093'
+  alias: '[general] OneMeter notification'
+  description: Notification to update OneMeter readout
+  trigger:
+  - platform: template
+    value_template: '{{ as_timestamp(now()) - as_timestamp(states.sensor.onemeter_timestamp.last_updated)
+      > 86400 }}'
+  condition:
+  - condition: time
+    after: 08:00:00
+    before: '20:00:00'
+  action:
+  - service: notify.mobile_app_sm_n975f
+    data:
+      message: Sprawdź odczyt OneMeter
+      title: OneMeter
+  - service: notify.persistent_notification
+    data:
+      title: OneMeter
+      message: Sprawdź odczyt OneMeter
+  mode: single
+- id: '1620640470130'
+  alias: '[lights] GAME ON!'
+  description: Atmosfera do grania w PS
+  trigger:
+  - platform: state
+    entity_id: device_tracker.playstation_5
+    from: not_home
+    to: home
+  - platform: sun
+    event: sunset
+  condition:
+  - condition: sun
+    before: sunrise
+    after: sunset
+  - condition: device
+    device_id: 4b3db5b087017548c34c4ad5d687e9b9
+    domain: device_tracker
+    entity_id: device_tracker.playstation_5
+    type: is_home
+  action:
+  - service: light.turn_on
+    target:
+      entity_id: light.sonoff_1000ee217a
+    data:
+      color_name: blue
+      brightness_pct: 80
+  - service: light.turn_on
+    target:
+      entity_id: light.sonoff_1000f44d8b
+    data:
+      color_name: blue
+      brightness_pct: 80
+  - scene: scene.game_on
+  mode: single
+- id: '1620834901665'
+  alias: '[media] Music - pause'
+  description: Pauza muzyki, bo praca w słuchawkach
+  trigger:
+  - platform: state
+    entity_id: sensor.headphones_connection
+    from: 'False'
+    to: 'True'
+  condition:
+  - condition: state
+    entity_id: media_player.spotify_peetereczek
+    state: playing
+  - condition: zone
+    entity_id: person.piotr
+    zone: zone.home
+  - condition: or
+    conditions:
+    - condition: state
+      entity_id: sensor.samsung_soundbar_q70t_media_playback_status
+      state: playing
+    - condition: state
+      entity_id: switch.skipper_tv
+      state: 'on'
+  action:
+  - service: media_player.media_pause
+    target:
+      entity_id: media_player.spotify_peetereczek
+  mode: single
+- id: '1620835229068'
+  alias: '[media] Music - play'
+  description: Wznów muzykę po zdjęciu słuchawek
+  trigger:
+  - platform: state
+    entity_id: sensor.headphones_connection
+    from: 'True'
+    to: 'False'
+  condition:
+  - condition: zone
+    entity_id: person.piotr
+    zone: zone.home
+  - condition: state
+    entity_id: sensor.samsung_soundbar_q70t_media_playback_status
+    state: paused
+  action:
+  - service: media_player.media_play
+    target:
+      entity_id: media_player.spotify_peetereczek
+  mode: single
+- id: '1620903059726'
+  alias: '[lights] Turn all off while sleeping'
+  description: Jeżeli telefon uważa, że spisz, wyłącz światła
+  trigger:
+  - platform: numeric_state
+    entity_id: sensor.sm_n975f_pewnosc_snu
+    above: '92'
+    for: 00:02:00
+  condition:
+  - condition: zone
+    entity_id: person.piotr
+    zone: zone.home
+  action:
+  - service: light.turn_off
+    target:
+      entity_id:
+      - light.living_room_rgb
+      - light.0x14b457fffef67f86_light
+      - light.0xbc33acfffe6f251a
+      - light.0xd0cf5efffe32186d
   mode: single

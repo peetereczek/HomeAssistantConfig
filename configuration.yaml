@@ -7,6 +7,17 @@ homeassistant:
 frontend:
   themes: !include_dir_merge_named themes
 python_script:
+http:
+api:
+
+logger:
+  default: info
+  logs:
+    custom_components.ztm: debug
+    custom_components.ztm.sensor: debug
+    homeassistant.components.ztm: debug
+    ztm: debug
+    
 
 #panel_custom:
 #  - name: floorplan
@@ -24,18 +35,25 @@ automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
 
-asuswrt:
-  host: 192.168.50.1
-  port: 1025
-  protocol: ssh
-  username: !secret login
-  password: !secret passwd1
-  sensors:
-    - devices
-    - upload
-    - download
-    - upload_speed
-    - download_speed
+#asuswrt:
+#  host: 192.168.50.1
+#  port: 1025
+#  protocol: ssh
+#  username: !secret login
+#  password: !secret passwd1
+#  sensors:
+#    - devices
+#    - upload
+#    - download
+#    - upload_speed
+#    - download_speed
+
+#fan:
+#  - platform: xiaomi_miio
+#    name: Air Purifier Salon
+#    host: 192.168.50.124
+#    token: !secret xiaomiAirToken
+#    model: zhimi.airpurifier.mb3
 
 media_player:
   - platform: samsungtv_tizen
@@ -43,12 +61,28 @@ media_player:
     mac: !secret tv_mac
     app_list: '{"YouTube": "111299001912", "HBO GO": "3201706012478", "Prime Video": "3201512006785"}'
     is_frame_tv: True
+  - platform: smartthings_soundbar
+    name: Soundbar
+    api_key: !secret samsung_sound_api
+    device_id: !secret soundbar_id
+    max_volume: 20
+
+spotify:
+  client_id: !secret spotify_id
+  client_secret: !secret spotify_key
+
+device_tracker:
+  - platform: google_maps
+    username: pjhomeassistant@gmail.com
+    scan_interval: 60
+#  - platform: bluetooth_le_tracker
+#    track_battery: true
 
 binary_sensor:
   - platform: workday
     country: PL
   - platform: car_wash
-    weather: weather.wolczynska
+    weather: weather.home
   - platform: template
     sensors:
       window:
@@ -64,10 +98,10 @@ sonoff:
   username: !secret hamail
   password: !secret haintegration
 
-ble_monitor:
-    devices:
-        - mac: 'A4:C1:38:47:06:3C'
-          encryption_key: 'c4363fabc4cad597703e311d844e8377'
+#ble_monitor:
+#    devices:
+#        - mac: 'A4:C1:38:47:06:3C'
+#          encryption_key: 'c4363fabc4cad597703e311d844e8377'
 
 light:
   - platform: group
@@ -83,20 +117,20 @@ alarm_control_panel:
     delay_time: 2
     trigger_time: 60
 
-yahoofinance:
-  symbols:
-    - ^DJI
-    - CL=F
-    - GC=F
-    - AMZN
-    - GOOGL
-    - MSFT
-    - AAPL
-    - 005930.KS
-    - PLN=X
-    - EUR=X
-    - BTC-USD
-  show_trending_icon: true
+#yahoofinance:
+#  symbols:
+#    - ^DJI
+#    - CL=F
+#    - GC=F
+#    - AMZN
+#    - GOOGL
+#    - MSFT
+#    - AAPL
+#    - 005930.KS
+#    - PLN=X
+#    - EUR=X
+#    - BTC-USD
+#  show_trending_icon: true
 
 sensor:
   - platform: uptime
@@ -116,32 +150,32 @@ sensor:
     unit_of_measurement: "°C"
     value_template: '{{ value | multiply(0.001) | round(2) }}'
     scan_interval:
-      hours: 4
+      minutes: 15
   - platform: template
     sensors:
       termostat_1_error:
         friendly_name: "Temperature 1 error"
         unit_of_measurement: '°C'
-        value_template: "{{(state_attr('climate.bf87b397ec02c5a554ywfj','current_temperature') | float - state_attr('sensor.ble_temperature_582d34388e86','mean') | float) | round(1) }}"
+        value_template: "{{(state_attr('climate.salon','current_temperature') | float - states('sensor.582d34388e86_temperature') | float) | round(1, default=0) }}"
       termostat_2_error:
         friendly_name: "Temperature 2 error"
         unit_of_measurement: '°C'
-        value_template: "{{(state_attr('climate.bf859bbe3ceddf4c11t0qe','current_temperature') | float - state_attr('sensor.ble_temperature_a4c13847063c','mean') | float) | round(1) }}"
+        value_template: "{{(state_attr('climate.sypialnia','current_temperature') | float - states('sensor.a4c13847063c_temperature') | float) | round(1, default=0) }}"
       termostat_1_temp:
         friendly_name: "Termostat 1 temp"
         unit_of_measurement: '°C'
         value_template: >-
-                {{ state_attr('climate.bf87b397ec02c5a554ywfj', 'current_temperature') }}
+                {{ state_attr('climate.salon', 'current_temperature') }}
       termostat_2_temp:
         friendly_name: "Termostat 2 temp"
         unit_of_measurement: '°C'
         value_template: >-
-                {{ state_attr('climate.bf859bbe3ceddf4c11t0qe', 'current_temperature') }}
+                {{ state_attr('climate.sypialnia', 'current_temperature') }}
       termostat_3_temp:
         friendly_name: "Termostat 3 temp"
         unit_of_measurement: '°C'
         value_template: >-
-                {{ state_attr('climate.bfedbbe72bb7a3d9bcvav6', 'current_temperature') }}
+                {{ state_attr('climate.lazienka', 'current_temperature') }}
   - platform: template
     sensors:
       battery_mi1:
@@ -160,11 +194,33 @@ sensor:
         device_class: battery
   - platform: template
     sensors:
+      smartwatch_connection:
+        friendly_name: 'Galaxy Watch 4'
+        value_template: >-
+                {{ '58:A6:39:82:23:64' in state_attr('sensor.sm_n975f_polaczenie_bluetooth', 'connected_paired_devices') }}
+        icon_template: >-
+            {{ 'mdi:watch' }}
+      headphones_connection:
+        friendly_name: 'Bose NC700'
+        value_template: >-
+                {{ '4C:87:5D:2A:0B:54' in state_attr('sensor.sm_n975f_polaczenie_bluetooth', 'connected_paired_devices') }}
+        icon_template: >-
+            {{ 'mdi:headphones-bluetooth' }}
+  - platform: template
+    sensors:
       battery_mi3:
         friendly_name: "Battery MiTemp 3"
         unit_of_measurement: '%'
         value_template: >-
                 {{ state_attr('sensor.ble_temperature_a4c13847063c', 'battery_level')|round }}
+        device_class: battery
+  - platform: template
+    sensors:
+      battery_onemeter:
+        friendly_name: "Battery OneMeter"
+        unit_of_measurement: '%'
+        value_template: >-
+                {{ ((1-((3 - (states('sensor.onemeter_voltage') | float)) / 0.3 )) * 100) | round() }}
         device_class: battery
   - platform: template
     sensors:
@@ -207,6 +263,8 @@ sensor:
       - 'Temperature'
     scan_interval:
       minutes: 20
+  - platform: hydro_imgw
+    station_id: "152210170"
   - platform: ztm
     api_key: !secret ztm_api
     lines:
@@ -222,3 +280,108 @@ sensor:
       - number: 33
         stop_id: 6026
         stop_number: "03"
+#  - platform: waze_travel_time
+#    origin: person.piotr
+#    destination: zone.home
+#    region: 'EU'
+#    name: "Me to home"
+#  - platform: waze_travel_time
+#    origin: person.piotr
+#    destination: zone.zone
+#    region: 'EU'
+#    name: "Me to office"
+  - platform: history_stats
+    name: Czas home office
+    entity_id: device_tracker.plpjarmoszko03_2
+    state: 'home'
+    type: time
+    start: '{{ as_timestamp( now().replace(hour=0).replace(minute=0).replace(second=0) ) - now().weekday() * 86400 }}'
+    end: '{{ now() }}'
+  - platform: history_stats
+    name: Czas w biurze
+    entity_id: device_tracker.sm_n975f
+    state: 'Deloitte CBT'
+    type: time
+    start: '{{ as_timestamp( now().replace(hour=0).replace(minute=0).replace(second=0) ) - now().weekday() * 86400 }}'
+    end: '{{ now() }}'
+  - platform: rest
+    scan_interval: 1800
+    name: OneMeter
+    resource: https://cloud.onemeter.com/api/devices/97105fd9-e4c3-4781-8f92-83b6c12e2d80
+    value_template: "{{ value_json.lastReading.OBIS['F_8_0'] }} {{ value_json.lastReading.OBIS['S_1_1_2'] }} {{ value_json.lastReading.OBIS['S_1_1_4'] }} {{ value_json.usage['thisMonth'] }} {{ value_json.usage['previousMonth'] }} {{ value_json.usage['projection'] }} {{ value_json.firmware['currentVersion'] }}"
+    force_update: true
+    headers:
+      Authorization: !secret onemeter_api
+  - platform: template
+    sensors:
+      onemeter_kwh:
+        friendly_name: "Energy Readout"
+        unit_of_measurement: "kWh"
+        icon_template: mdi:flash
+        device_class: energy
+#        state_class: total_increasing
+#        last_reset: 2021-09-07T17:45:00
+        value_template: "{{ states.sensor.onemeter.state.split(' ')[0] }}"
+#        native_value: "{{ states.sensor.onemeter.state.split(' ')[0] }}"
+#        native_unit_of_measurement: "kWh"
+      onemeter_voltage:
+        friendly_name: "Battery Voltage"
+        unit_of_measurement: "v"
+        icon_template: mdi:battery
+        value_template: "{{ states.sensor.onemeter.state.split(' ')[1] }}"
+      onemeter_timestamp:
+        friendly_name: "Last Readout"
+        icon_template: mdi:clock
+        value_template: "{{ as_timestamp(states.sensor.onemeter.state.split(' ')[2]) | timestamp_custom('%d-%m-%Y %H:%M', True) }}"
+      onemeter_this_month:
+        friendly_name: "Current Monthly Consumption"
+        unit_of_measurement: "kWh"
+        icon_template: mdi:calendar-month
+        value_template: "{{ states.sensor.onemeter.state.split(' ')[3] | float | round(2) }}"
+      onemeter_previous_month:
+        friendly_name: "Previous Month Consumption"
+        unit_of_measurement: "kWh"
+        icon_template: mdi:calendar-multiple
+        value_template: "{{ states.sensor.onemeter.state.split(' ')[4] | float | round(2) }}"
+      onemeter_projection:
+        friendly_name: "Projected Monthly Consumption"
+        unit_of_measurement: "kWh"
+        icon_template: mdi:calendar-search
+        value_template: "{{ states.sensor.onemeter.state.split(' ')[5] | float | round(2) }}"
+      onemeter_firmware:
+        friendly_name: "Firmware Version"
+        icon_template: mdi:chip
+        value_template: "{{ states.sensor.onemeter.state.split(' ')[6] }}"
+  - platform: template
+    sensors:
+      air_purifier_mode:
+        friendly_name: "Working Mode"
+        value_template: "{{ state_attr('fan.mi_air_purifier_3_3h', 'speed') }}"
+        icon_template: >-
+          {% if state_attr('fan.mi_air_purifier_3_3h', 'speed') == 'Auto' %}
+            mdi:power-cycle
+          {% elif state_attr('fan.mi_air_purifier_3_3h', 'speed') == 'Fan' %}
+            mdi:fan
+          {% elif state_attr('fan.mi_air_purifier_3_3h', 'speed') == 'Silent' %}
+            mdi:weather-night
+          {% endif %}
+#  - platform: powercalc
+#    entity_id: light.sonoff_1000f44d8b
+#  - platform: powercalc
+#    entity_id: light.sonoff_1000ee217a
+#  - platform: powercalc
+#    entity_id: light.sonoff_1000ee2034
+#  - platform: powercalc
+#    entity_id: light.0x14b457fffef67f86_light
+#    manufacturer: ikea
+#    model: LED1733G7
+#  - platform: powercalc
+#    entity_id: light.0xd0cf5efffe32186d
+#    manufacturer: ikea
+#    model: LED1733G7
+#  - platform: powercalc
+#    entity_id: light.0xbc33acfffe6f251a
+#    manufacturer: ikea
+#  - platform: powercalc
+#    entity_id: light.0x5c0272fffe70d31b
+#    manufacturer: ikea
