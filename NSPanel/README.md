@@ -10,6 +10,7 @@ What you can find in my configuration:
 - Original UI
 - Time updates
 - Weather updates
+- BLE tracker
 - Light control
 - RGB light control
 - Scenes activations ( + cheated (a bit) alarm control)
