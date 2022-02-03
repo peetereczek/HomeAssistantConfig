@@ -10,10 +10,11 @@ What you can find in my configuration:
 - Original UI
 - Time updates
 - Weather updates
-- BLE tracker
+- RTTTL song (sound notification on actions)
+- BLE tracker (very heavy and makes NSPanel unstable)
 - Light control
 - RGB light control
-- Scenes activations ( + cheated (a bit) alarm control)
-- Thermostat is not used, as I don't have any
+- Scenes activations (with cheated a bit, alarm control)
+- Thermostat (is not used, as I don't have any)
 
 You can find more (such as switch control) by looking on DeanoXX configuration of NSPanel [YouTube demo](https://www.youtube.com/watch?v=7T5r5sy_rpc)
