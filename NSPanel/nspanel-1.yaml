@@ -7,9 +7,8 @@ esp32:
 
 # Enable logging
 logger:
-  on_message:
-      level: DEBUG
-      then:
+  level: DEBUG
+
 # Enable Home Assistant API
 api:
   id: api_id
@@ -21,6 +20,12 @@ api:
         my_json: string
       then:
         - lambda: 'id(nspanel1).send_json_command(my_type,my_json);'
+    - service: play_rtttl
+      variables:
+        song_str: string
+      then:
+        - rtttl.play:
+            rtttl: !lambda 'return song_str;'
 
 ota:
   password: "123456"
@@ -70,12 +75,9 @@ external_components:
     components: ["nspanel"]
     refresh: 0s
 
-# Enable Bluetooth scanning for this ESP32
-esp32_ble_tracker:
-
-# Update Weather Hourly
+# Update Weather Interval
 interval:
-  - interval: 60min
+  - interval: 30min
     then:
        - script.execute: nspanel_weather
 
@@ -277,7 +279,7 @@ nspanel:
                         entity_id: climate.shed
                         temperature: !lambda 'return root["ATCExpect0"].as<int>();'
                         hvac_mode: heat
- 
+    
 output:
   - platform: ledc
     id: ${switch_id}_buzzer_out
@@ -288,10 +290,27 @@ rtttl:
   id: ${switch_id}_buzzer
   output: ${switch_id}_buzzer_out
   
-switch:
-  # Restart Switch in HA
+button:
+  # Restart Button in HA
   - platform: restart
     name: "${switch_id} Restart"
+    device_class: restart
+
+number:
+  platform: template
+  name: "${switch_id} Brightness"
+  id: brightness
+  entity_category: config
+  unit_of_measurement: '%'
+  min_value: 0
+  max_value: 100
+  step: 1
+  initial_value: 50
+  set_action:
+    then: #json type 87 for screen brightness
+      - lambda: 'id(nspanel1).send_json_command(0x87, "");'
+
+switch:
   - platform: gpio
     # Panel Left Hand relay
     name: ${switch_id} Relay 1
@@ -361,9 +380,6 @@ binary_sensor:
       inverted: true
     on_click:
       - switch.toggle: ${switch_id}_relay_2
-  - platform: ble_presence
-    mac_address: 1E:3E:30:98:7B:34
-    name: "Presence Klucze Mieszkanie"
 # HA Tracking sensors for device states
 # Update nspanel on state change
   - platform: homeassistant
