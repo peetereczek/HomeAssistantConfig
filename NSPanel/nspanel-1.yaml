@@ -33,12 +33,6 @@ ota:
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
-  manual_ip:
-    static_ip: 192.168.50.151
-    gateway: 192.168.50.1
-    subnet: 255.255.255.0
-    dns1: 8.8.8.8
-    dns2: 192.168.50.165
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
@@ -336,14 +330,10 @@ switch:
       # Initiliase Screen - These timings could be more aggressive
       then:
         - delay: 6s
+        - logger.log: "[nspanel_boot] starting screen"
         - script.execute: nspanel_init
         - delay: 3s
-        - if:
-            condition:
-              api.connected:
-            then:
-              - logger.log: API is connected!
-        - script.execute: nspanel_weather
+        - logger.log: "[nspanel_boot] updating Wi-Fi state"
           # Must send Wifi State for widgets to update (particulalry after power-on of screen only
           # code taken from within NSPanel component code
         - lambda: |-
@@ -354,6 +344,14 @@ switch:
               root["rssiLevel"] = rssi;
             });
             id(nspanel1).send_json_command(0x85, json_str);
+        - if:
+            condition:
+              api.connected:
+            then:
+              - logger.log: "[nspanel_boot] Home Assistant API is connected!"
+        - logger.log: "[nspanel_boot] starting weather service"
+        - script.execute: nspanel_weather
+        - logger.log: "[nspanel_boot] boot sequence completed."
   - platform: template
     # Template switch to enable/disable screen dimming
     name: ${switch_id} Energy Saving Mode
@@ -610,7 +608,7 @@ script:
       # Widget 4
       - lambda: |-
           id(nspanel1).send_json_command(0x86,"{\"HMI_resources\":[{\"index\":4,\"ctype\":\"device\",\"id\":\"wled_sypialnia\",\"uiid\":33}]}");
-          id(nspanel1).send_json_command(0x86,"{\"relation\":[{\"ctype\":\"device\",\"id\":\"wled_sypialnia\",\"name\":\"Salon RGB\",\"online\":1,\"params\":{\"switch\":\"on\"}]}");
+          id(nspanel1).send_json_command(0x86,"{\"relation\":[{\"ctype\":\"device\",\"id\":\"wled_sypialnia\",\"name\":\"Bed RGB\",\"online\":1,\"params\":{\"switch\":\"on\"}]}");
       # Widget 5
       - lambda: |-
           id(nspanel1).send_json_command(0x86,"{\"HMI_resources\":[{\"index\":5,\"ctype\":\"scene\",\"id\":\"alarm_night\"}]}");
@@ -626,6 +624,7 @@ script:
           id(nspanel1).send_json_command(0x86,"{\"HMI_resources\":[{\"index\":8,\"ctype\":\"scene\",\"id\":\"scene_sleep\"}]}");
           id(nspanel1).send_json_command(0x86,"{\"relation\":[{\"ctype\":\"scene\",\"id\":\"scene_sleep\",\"name\":\"Spanie\"}]}");
       # Update existing Entities / Widgets
+      - logger.log: "[nspanel_boot] updating widgets state"
       - script.execute: ha_dim_light_salon_update
       - script.execute: ha_wled_salon_update
       - script.execute: ha_dim_light_sypialnia_update
@@ -634,15 +633,18 @@ script:
       - lambda: 'id(nspanel1).send_json_command(0x84,"{\"HMI_ATCDevice\":{\"ctype\":\"device\",\"id\":\"climate\",\"outlet\":0,\"etype\":\"hot\"}}");'
       - lambda: 'id(nspanel1).send_json_command(0x84,"{\"ATCMode\":0}");'
       # Update Thermostat
+      - logger.log: "[nspanel_boot] updating thermostate state"
       - script.execute: ha_thermostat_update_state
       - script.execute: ha_thermostat_update_temp
   - id: nspanel_weather
     # Grab weather status (JSON) from https://wttr.in
     then:
-      - logger.log: "nspanel_weather started"
+      - logger.log: "[nspanel_weather] started"
       - lambda: |-
           WiFiClientSecure client;
           HTTPClient http;
+          bool begin_status = false;
+          int httpCode = 0;
           int wicon,wicon_out;
           std::string buffer;
           // Disable certificate checking
@@ -650,11 +652,21 @@ script:
           
           ESP_LOGD("nspanel_weather", "Init Complete");
           //use appropriate location - test in browser without "?format=j2" for normal output
-          http.begin(client,"wttr.in",443,"/${wttr_location}?format=j2",true);
-          ESP_LOGD("nspanel_weather", "http.begin OK");
+          begin_status = http.begin(client,"wttr.in",443,"/${wttr_location}?format=j2",true);
+          if(!begin_status){
+            ESP_LOGD("nspanel_weather", "http.begin failed");
+          } else {
+            ESP_LOGD("nspanel_weather", "http.begin OK");
+          }
           http.useHTTP10(true);
-          int httpCode = http.GET();
-          ESP_LOGD("nspanel_weather", "http.GET OK");
+          ESP_LOGD("nspanel_weather", "http.useHTTP10 flag set");
+          ESP_LOGD("nspanel_weather", "http.GET");
+          httpCode = http.GET();
+          if(!httpCode){
+            ESP_LOGD("nspanel_weather", "http.GET NOK");
+          } else {
+            ESP_LOGD("nspanel_weather", "http.GET OK");
+          }
           if (httpCode > 0) {
             // http response received
             ESP_LOGD("nspanel_weather", "HTTP response code is %i", httpCode);
@@ -665,7 +677,7 @@ script:
               if (root.containsKey("current_condition")) {
                 ESP_LOGD("nspanel_weather", "JSON Parse OK");
                 wicon = int( root["current_condition"][0]["weatherCode"].as<signed int>());
-                ESP_LOGD("nspanel_weather", "weather code received: %i",wicon);
+                ESP_LOGD("nspanel_weather", "weather code received: %i", wicon);
                 
                 // Translate wttr.in weather code to use correct nspanel icon
                 // Mapping from Tasmota nspanel.be code
@@ -724,7 +736,12 @@ script:
                 // Temp range max = weather_0["maxtempC"]
                 id(nspanel1).send_json_command(0x81,"{\"HMI_weather\":" + to_string(wicon_out) + ",\"HMI_outdoorTemp\":{\"current\":" + root["current_condition"][0]["temp_C"].as<const char*>() + ",\"range\":\"" +root["weather"][0]["mintempC"].as<const char*>() + "," +  root["weather"][0]["maxtempC"].as<const char*>() + "\"}}");
               } else {
-                ESP_LOGD("nspanel_weather", "Current Condition not found");
+                ESP_LOGD("nspanel_weather", "Current weather condition not found, JSON parsing failed");
               }
-            }              
+            } else {
+              ESP_LOGD("nspanel_weather", "Wrong HTTP response: %i", httpCode);
+            }
+          } else {
+            ESP_LOGD("nspanel_weather", "No HTTP response");
           }
+      - logger.log: "[nspanel_weather] weather update completed"
