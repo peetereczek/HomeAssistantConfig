@@ -18,3 +18,6 @@ What you can find in my configuration:
 - Thermostat (is not used, as I don't have any)
 
 You can find more (such as switch control) by looking on DeanoXX configuration of NSPanel [YouTube demo](https://www.youtube.com/watch?v=7T5r5sy_rpc)
+
+Known BUG:
+- Light temperature is not working (yet)
