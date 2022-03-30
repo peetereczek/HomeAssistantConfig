@@ -1,0 +1,92 @@
+esphome:
+  name: mi-bt
+  platform: ESP32
+  board: esp-wrover-kit
+  comment: ESP Xiaomi BLE tracker
+  on_boot:
+    if:
+      condition:
+        wifi.connected:
+      then:
+        - logger.log: "WiFi is connected!"
+
+wifi:
+  networks:
+    - ssid: !secret wifi_ssid_2
+      password: !secret wifi_password
+    - ssid: !secret wifi_ssid_1
+      password: !secret wifi_password
+  manual_ip:
+    static_ip: 192.168.50.160
+    gateway: 192.168.50.1
+    subnet: 255.255.255.0
+    dns1: 8.8.8.8
+    dns2: 192.168.50.165
+  reboot_timeout: 2min
+  output_power: 15dB
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Mi-bt Fallback Hotspot"
+    password: "1234567890"
+
+web_server:
+  port: 80
+
+captive_portal:
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+  password: !secret ota
+
+# Enable Bluetooth scanning for this ESP32
+esp32_ble_tracker:
+  on_ble_manufacturer_data_advertise:
+      - manufacturer_id: FD5A
+        then:
+          - lambda: |-
+              if (x[0] != 0x7b || x[1] != 0x61) return;
+              int value = x[2] + (x[3] << 8);
+              id(ble_sensor2).publish_state(value);
+  on_ble_service_data_advertise:
+    - service_uuid: FD5A
+      then:
+        - lambda: 'id(ble_sensor1).publish_state(x[0]);'
+
+binary_sensor:
+  - platform: ble_presence
+    service_uuid: 'FD5A'
+    name: "SmartTag Presence"
+
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: "mi-bt IP Address"
+    ssid:
+      name: "mi-bt Connected SSID"
+
+sensor:
+  - platform: uptime
+    name: "mi-bt Uptime Sensor"
+  - platform: wifi_signal
+    name: "mi-bt WiFi Signal"
+    update_interval: 60s
+  - platform: xiaomi_lywsdcgq
+    mac_address: 58:2D:34:38:8D:0F
+    temperature:
+      name: "Balkon Temperature"
+    humidity:
+      name: "Balkon Humidity"
+    battery_level:
+      name: "Balkon Battery Level"
+  - platform: template
+    name: "BLE Service Sniffer"
+    id: ble_sensor1
+  - platform: template
+    name: "BLE Data Sniffer"
+    id: ble_sensor2
