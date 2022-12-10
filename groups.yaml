@@ -1,0 +1,6 @@
+updaters:
+    name: Updates
+    entities:
+      - binary_sensor.updater_core
+      - binary_sensor.updater_supervisor
+      - binary_sensor.updater_os

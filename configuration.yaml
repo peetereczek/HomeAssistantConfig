@@ -1,4 +1,3 @@
-
 # Configure a default setup of Home Assistant (frontend, api, etc)
 default_config:
 
@@ -6,18 +5,29 @@ homeassistant:
   customize: !include customize.yaml
 frontend:
   themes: !include_dir_merge_named themes
+  extra_module_url:
+    - /hacsfiles/lovelace-card-mod/card-mod.js
 python_script:
 http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 172.30.33.0/24
 api:
 
 logger:
-  default: info
-  logs:
-    custom_components.ztm: debug
-    custom_components.ztm.sensor: debug
-    homeassistant.components.ztm: debug
-    ztm: debug
-    
+
+lovelace:
+  mode: storage
+  # Add yaml dashboards
+  dashboards:
+    lovelace-minimalist:
+      mode: yaml
+      title: Minimalist
+      icon: mdi:script
+      show_in_sidebar: true
+      filename: lovelace-minimalist.yaml
+browser_mod:
+  disable: all
 
 #panel_custom:
 #  - name: floorplan
@@ -35,21 +45,14 @@ automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
 
-#asuswrt:
-#  host: 192.168.50.1
-#  port: 1025
-#  protocol: ssh
-#  username: !secret login
-#  password: !secret passwd1
-#  sensors:
-#    - devices
-#    - upload
-#    - download
-#    - upload_speed
-#    - download_speed
+recorder:
+  purge_keep_days: 3
+  exclude:
+    entities:
+      - sensor.icloud3_event_log
 
 #fan:
-#  - platform: xiaomi_miio
+#  - platform: xiaomi_miio_airpurifier
 #    name: Air Purifier Salon
 #    host: 192.168.50.124
 #    token: !secret xiaomiAirToken
@@ -59,7 +62,7 @@ media_player:
   - platform: samsungtv_tizen
     host: 192.168.50.21
     mac: !secret tv_mac
-    app_list: '{"YouTube": "111299001912", "HBO GO": "3201706012478", "Prime Video": "3201512006785"}'
+    app_list: '{"YouTube": "111299001912", "Spotify": "3201606009684", "Netflix": "11101200001"}'
     is_frame_tv: True
   - platform: smartthings_soundbar
     name: Soundbar
@@ -67,16 +70,13 @@ media_player:
     device_id: !secret soundbar_id
     max_volume: 20
 
-spotify:
-  client_id: !secret spotify_id
-  client_secret: !secret spotify_key
-
 device_tracker:
   - platform: google_maps
-    username: pjhomeassistant@gmail.com
-    scan_interval: 60
-#  - platform: bluetooth_le_tracker
-#    track_battery: true
+    username: !secret hamail
+    max_gps_accuracy: 50
+  - platform: icloud3
+    username: !secret login2
+    password: !secret passwd3
 
 binary_sensor:
   - platform: workday
@@ -94,14 +94,21 @@ binary_sensor:
           {% else %}
             mdi:window-closed-variant
           {% endif %}
+  - platform: threshold
+    name: Updater HACS Count
+    entity_id: sensor.hacs
+    upper: 0.5
+
 sonoff:
   username: !secret hamail
   password: !secret haintegration
-
-#ble_monitor:
-#    devices:
-#        - mac: 'A4:C1:38:47:06:3C'
-#          encryption_key: 'c4363fabc4cad597703e311d844e8377'
+  devices:
+    1000ee217a:
+      device_class: light
+    1000f44d8b:
+      device_class: light
+    1001041ac0:
+      device_class: light
 
 light:
   - platform: group
@@ -109,6 +116,13 @@ light:
     entities:
       - light.sonoff_1000ee217a
       - light.sonoff_1000f44d8b
+  - platform: group
+    name: Living Room Light Group
+    entities:
+      - light.light_ikea_biurko
+      - light.light_ikea_kanapa
+      - light.light_ikea_szafkatv
+      - light.sonoff_1001041ac0
 
 alarm_control_panel:
   - platform: manual
@@ -117,24 +131,21 @@ alarm_control_panel:
     delay_time: 2
     trigger_time: 60
 
-#yahoofinance:
-#  symbols:
-#    - ^DJI
-#    - CL=F
-#    - GC=F
-#    - AMZN
-#    - GOOGL
-#    - MSFT
-#    - AAPL
-#    - 005930.KS
-#    - PLN=X
-#    - EUR=X
-#    - BTC-USD
-#  show_trending_icon: true
+powercalc:
+  enable_autodiscovery: true
+  create_energy_sensors: true
 
 sensor:
-  - platform: uptime
-  - platform: version
+  - platform: time_date
+    display_options:
+      - 'time'
+      - 'date'
+      - 'date_time'
+      - 'date_time_utc'
+      - 'date_time_iso'
+      - 'time_date'
+      - 'time_utc'
+      - 'beat'
   - platform: systemmonitor
     resources:
       - type: disk_use_percent
@@ -151,31 +162,31 @@ sensor:
     value_template: '{{ value | multiply(0.001) | round(2) }}'
     scan_interval:
       minutes: 15
-  - platform: template
-    sensors:
-      termostat_1_error:
-        friendly_name: "Temperature 1 error"
-        unit_of_measurement: '°C'
-        value_template: "{{(state_attr('climate.salon','current_temperature') | float - states('sensor.582d34388e86_temperature') | float) | round(1, default=0) }}"
-      termostat_2_error:
-        friendly_name: "Temperature 2 error"
-        unit_of_measurement: '°C'
-        value_template: "{{(state_attr('climate.sypialnia','current_temperature') | float - states('sensor.a4c13847063c_temperature') | float) | round(1, default=0) }}"
-      termostat_1_temp:
-        friendly_name: "Termostat 1 temp"
-        unit_of_measurement: '°C'
-        value_template: >-
-                {{ state_attr('climate.salon', 'current_temperature') }}
-      termostat_2_temp:
-        friendly_name: "Termostat 2 temp"
-        unit_of_measurement: '°C'
-        value_template: >-
-                {{ state_attr('climate.sypialnia', 'current_temperature') }}
-      termostat_3_temp:
-        friendly_name: "Termostat 3 temp"
-        unit_of_measurement: '°C'
-        value_template: >-
-                {{ state_attr('climate.lazienka', 'current_temperature') }}
+#  - platform: template
+#    sensors:
+#      termostat_1_error:
+#        friendly_name: "Temperature 1 error"
+#        unit_of_measurement: '°C'
+#        value_template: "{{(state_attr('climate.salon','current_temperature') | float - states('sensor.582d34388e86_temperature') | float) | round(1, default=0) }}"
+#      termostat_2_error:
+#        friendly_name: "Temperature 2 error"
+#        unit_of_measurement: '°C'
+#        value_template: "{{(state_attr('climate.sypialnia','current_temperature') | float - states('sensor.a4c13847063c_temperature') | float) | round(1, default=0) }}"
+#      termostat_1_temp:
+#        friendly_name: "Termostat 1 temp"
+#        unit_of_measurement: '°C'
+#        value_template: >-
+#                {{ state_attr('climate.salon', 'current_temperature') }}
+#      termostat_2_temp:
+#        friendly_name: "Termostat 2 temp"
+#        unit_of_measurement: '°C'
+#        value_template: >-
+#                {{ state_attr('climate.sypialnia', 'current_temperature') }}
+#      termostat_3_temp:
+#        friendly_name: "Termostat 3 temp"
+#        unit_of_measurement: '°C'
+#        value_template: >-
+#                {{ state_attr('climate.lazienka', 'current_temperature') }}
   - platform: template
     sensors:
       battery_mi1:
@@ -194,20 +205,6 @@ sensor:
         device_class: battery
   - platform: template
     sensors:
-      smartwatch_connection:
-        friendly_name: 'Galaxy Watch 4'
-        value_template: >-
-                {{ '58:A6:39:82:23:64' in state_attr('sensor.sm_n975f_polaczenie_bluetooth', 'connected_paired_devices') }}
-        icon_template: >-
-            {{ 'mdi:watch' }}
-      headphones_connection:
-        friendly_name: 'Bose NC700'
-        value_template: >-
-                {{ '4C:87:5D:2A:0B:54' in state_attr('sensor.sm_n975f_polaczenie_bluetooth', 'connected_paired_devices') }}
-        icon_template: >-
-            {{ 'mdi:headphones-bluetooth' }}
-  - platform: template
-    sensors:
       battery_mi3:
         friendly_name: "Battery MiTemp 3"
         unit_of_measurement: '%'
@@ -220,7 +217,11 @@ sensor:
         friendly_name: "Battery OneMeter"
         unit_of_measurement: '%'
         value_template: >-
-                {{ ((1-((3 - (states('sensor.onemeter_voltage') | float)) / 0.3 )) * 100) | round() }}
+                {% if states('sensor.onemeter_voltage') | float(0) > 3 %}
+                  100
+                {% else %}
+                  {{ (((states('sensor.onemeter_voltage') | float) - 2.64) / ((3.3 - 2.64) / 1000)) | round(0) }}
+                {% endif %}
         device_class: battery
   - platform: template
     sensors:
@@ -228,9 +229,9 @@ sensor:
         friendly_name: "Czy dziś praca?"
         value_template: >-
           {% if is_state("binary_sensor.workday_sensor","on") %}
-            Dziś jest dzień pracujący.
+            Dzień pracujący.
           {% else %}
-            Dziś jest dzień wolny.
+            Dzień wolny.
           {% endif %}
         icon_template: >-
           {% if is_state("binary_sensor.workday_sensor","on") %}
@@ -241,7 +242,7 @@ sensor:
   - platform: looko2
     api_key: !secret looko2
     name: LookO2
-    station_id: 'A020A603680A'
+    station_id: 'A848FACD6A61' #60019458BAAC A020A603680A
     monitored_conditions:
       - 'AverageHCHO'
       - 'AveragePM1'
@@ -268,44 +269,34 @@ sensor:
   - platform: ztm
     api_key: !secret ztm_api
     lines:
-      - number: 10
+      - number: 26
         stop_id: 6027
         stop_number: "04"
       - number: 33
         stop_id: 6027
         stop_number: "04"
-      - number: 10
+      - number: 26
         stop_id: 6026
         stop_number: "03"
       - number: 33
         stop_id: 6026
         stop_number: "03"
-#  - platform: waze_travel_time
-#    origin: person.piotr
-#    destination: zone.home
-#    region: 'EU'
-#    name: "Me to home"
-#  - platform: waze_travel_time
-#    origin: person.piotr
-#    destination: zone.zone
-#    region: 'EU'
-#    name: "Me to office"
   - platform: history_stats
     name: Czas home office
-    entity_id: device_tracker.plpjarmoszko03_2
+    entity_id: device_tracker.plpjarmoszko03_3
     state: 'home'
     type: time
     start: '{{ as_timestamp( now().replace(hour=0).replace(minute=0).replace(second=0) ) - now().weekday() * 86400 }}'
     end: '{{ now() }}'
   - platform: history_stats
     name: Czas w biurze
-    entity_id: device_tracker.sm_n975f
-    state: 'Deloitte CBT'
+    entity_id: person.piotr
+    state: 'DeloitteCbt'
     type: time
     start: '{{ as_timestamp( now().replace(hour=0).replace(minute=0).replace(second=0) ) - now().weekday() * 86400 }}'
     end: '{{ now() }}'
   - platform: rest
-    scan_interval: 1800
+    scan_interval: 900
     name: OneMeter
     resource: https://cloud.onemeter.com/api/devices/97105fd9-e4c3-4781-8f92-83b6c12e2d80
     value_template: "{{ value_json.lastReading.OBIS['F_8_0'] }} {{ value_json.lastReading.OBIS['S_1_1_2'] }} {{ value_json.lastReading.OBIS['S_1_1_4'] }} {{ value_json.usage['thisMonth'] }} {{ value_json.usage['previousMonth'] }} {{ value_json.usage['projection'] }} {{ value_json.firmware['currentVersion'] }}"
@@ -315,15 +306,12 @@ sensor:
   - platform: template
     sensors:
       onemeter_kwh:
+        unique_id: "onemeter_kwh"
         friendly_name: "Energy Readout"
-        unit_of_measurement: "kWh"
+        unit_of_measurement: 'kWh'
         icon_template: mdi:flash
-        device_class: energy
-#        state_class: total_increasing
-#        last_reset: 2021-09-07T17:45:00
         value_template: "{{ states.sensor.onemeter.state.split(' ')[0] }}"
-#        native_value: "{{ states.sensor.onemeter.state.split(' ')[0] }}"
-#        native_unit_of_measurement: "kWh"
+        device_class: energy
       onemeter_voltage:
         friendly_name: "Battery Voltage"
         unit_of_measurement: "v"
@@ -352,36 +340,271 @@ sensor:
         friendly_name: "Firmware Version"
         icon_template: mdi:chip
         value_template: "{{ states.sensor.onemeter.state.split(' ')[6] }}"
+      energy_cost:
+        friendly_name: "Projected Monthly Cost"
+        icon_template: mdi:cash
+        unit_of_measurement: "PLN"
+        value_template: "{{ (states('sensor.onemeter_projection') | float()) * (states('input_number.cena_energii') | float()) }}"
   - platform: template
     sensors:
       air_purifier_mode:
         friendly_name: "Working Mode"
-        value_template: "{{ state_attr('fan.mi_air_purifier_3_3h', 'speed') }}"
+        value_template: "{{ state_attr('fan.zhimi_airpurifier_mb3', 'speed') }}"
         icon_template: >-
-          {% if state_attr('fan.mi_air_purifier_3_3h', 'speed') == 'Auto' %}
+          {% if state_attr('fan.zhimi_airpurifier_mb3', 'speed') == 'Auto' %}
             mdi:power-cycle
-          {% elif state_attr('fan.mi_air_purifier_3_3h', 'speed') == 'Fan' %}
+          {% elif state_attr('fan.zhimi_airpurifier_mb3', 'speed') == 'Fan' %}
             mdi:fan
-          {% elif state_attr('fan.mi_air_purifier_3_3h', 'speed') == 'Silent' %}
+          {% elif state_attr('fan.zhimi_airpurifier_mb3', 'speed') == 'Silent' %}
             mdi:weather-night
           {% endif %}
+  - platform: command_line
+    name: core_updates
+    command: 'curl http://supervisor/core/info -H "Authorization: Bearer $(printenv SUPERVISOR_TOKEN)" | jq ''{"latest_version":.data.version_latest,"installed_version":.data.version,"update_available":.data.update_available}'''
+    value_template: '{{ value_json.update_available }}'
+    scan_interval: 600
+    json_attributes:
+      - update_available
+      - latest_version
+      - installed_version
+  - platform: command_line
+    name: supervisor_updates
+    command: 'curl http://supervisor/supervisor/info -H "Authorization: Bearer $(printenv SUPERVISOR_TOKEN)" | jq ''{"latest_version":.data.version_latest,"installed_version":.data.version,"update_available":.data.update_available}'''
+    value_template: '{{ value_json.update_available }}'
+    scan_interval: 600
+    json_attributes:
+      - update_available
+      - latest_version
+      - installed_version
+  - platform: command_line
+    name: os_updates
+    command: 'curl http://supervisor/os/info -H "Authorization: Bearer $(printenv SUPERVISOR_TOKEN)" | jq ''{"latest_version":.data.version_latest,"installed_version":.data.version,"update_available":.data.update_available}'''
+    value_template: '{{ value_json.update_available }}'
+    scan_interval: 600
+    json_attributes:
+      - update_available
+      - latest_version
+      - installed_version
+  - platform: powercalc
+    entity_id: light.light_ikea_biurko #biurko
+    manufacturer: ikea
+    model: LED1733G7
+  - platform: powercalc
+    entity_id: light.light_ikea_kanapa #kanapa
+    manufacturer: ikea
+    model: LED1733G7
+  - platform: powercalc
+    entity_id: light.light_ikea_szafka_nocna #szafka nocna
+    manufacturer: ikea
+    model: LED1733G7
+  - platform: powercalc
+    entity_id: light.light_ikea_szafkatv #szafka TV
+    linear:
+      min_power: 1
+      max_power: 5
+    standby_power: 0.3
+  - platform: powercalc
+    entity_id: light.light_ikea_kuchnia #kuchnia szafki
+    linear:
+      min_power: 2.5
+      max_power: 15
+    standby_power: 0.3
+  - platform: powercalc
+    entity_id: light.1000ee217a #kanapa RGB
+    linear:
+      min_power: 1
+      max_power: 24
+    standby_power: 0.3
+  - platform: powercalc
+    entity_id: light.1000f44d8b #biurko RGB
+    linear:
+      min_power: 1
+      max_power: 24
+    standby_power: 0.3
+  - platform: powercalc
+    entity_id: light.1000ee2034 #lozko RGB
+    linear:
+      min_power: 0.5
+      max_power: 24
+    standby_power: 0.3
+  - platform: powercalc
+    entity_id: sensor.ps5_718_activity
+    fixed:
+      states_power:
+        playing: 200
+        idle: 15
+        power|STANDBY: 2
+        unavaliable: 0
 #  - platform: powercalc
-#    entity_id: light.sonoff_1000f44d8b
+#    entity_id: sensor.samsung_soundbar_q70t_media_playback_status
+#    fixed:
+#      power: 71
+#      states_power:
+#        paused: 3
+#        playing: 50
+#    standby_power: 1.35
 #  - platform: powercalc
-#    entity_id: light.sonoff_1000ee217a
-#  - platform: powercalc
-#    entity_id: light.sonoff_1000ee2034
-#  - platform: powercalc
-#    entity_id: light.0x14b457fffef67f86_light
-#    manufacturer: ikea
-#    model: LED1733G7
-#  - platform: powercalc
-#    entity_id: light.0xd0cf5efffe32186d
-#    manufacturer: ikea
-#    model: LED1733G7
-#  - platform: powercalc
-#    entity_id: light.0xbc33acfffe6f251a
-#    manufacturer: ikea
-#  - platform: powercalc
-#    entity_id: light.0x5c0272fffe70d31b
-#    manufacturer: ikea
+#    entity_id: media_player.samsung_tv_remote
+#    fixed:
+#      power: 150
+#    standby_power: 2
+  - platform: powercalc
+    entity_id: device_tracker.desktop_6ss38pm_4 #komputer
+    fixed:
+      power: 300
+  - platform: powercalc
+    entity_id: fan.zhimi_airpurifier_mb3
+    linear:
+      calibrate:
+        - 33 -> 8
+        - 66 -> 30
+        - 100 -> 38
+    standby_power: 0.3
+  - platform: powercalc
+    entity_id: device_tracker.xiaomi_gateway #xiaomi gateway 3
+    fixed:
+      power: 2.5
+  - platform: powercalc
+    entity_id: light.korytarz #korytarz
+    fixed:
+      power: 30
+    standby_power: 0.5
+  - platform: powercalc
+    entity_id: light.sonoff_1001041ac0 #zyrandol w salonie
+    fixed:
+      power: 75
+    standby_power: 0.2
+  - platform: template
+    sensors:
+      devices_with_low_battery:
+        friendly_name: 'Devices with Low Battery'
+        unit_of_measurement: devices
+        value_template: >-
+          {% set ignore_entities = [] %}
+          {{ states.sensor
+            | selectattr('attributes.device_class', 'eq', 'battery')
+            | rejectattr('entity_id', 'in', ignore_entities)
+            | map(attribute='state')
+            | reject('in', ['unknown', 'unavailable'])
+            | map('int', -1) | select('le', 30)
+            | select('ge', 0)
+            | list | count
+          }}
+        icon_template: >-
+          {% if is_state('sensor.devices_with_low_battery', '0') %}
+            mdi:battery-check
+          {% else %}
+            mdi:battery-alert
+          {% endif %}
+      
+template:
+    - sensor:
+        name: "consumed_power_total"
+        unit_of_measurement: 'kWh'
+        icon: mdi:flash
+        availability: "{{ not 'unavailable' in [states('sensor.onemeter')] }}"
+        state: "{{ states.sensor.onemeter.state.split(' ')[0] }}"
+        device_class: energy
+        state_class: total_increasing
+    - sensor:
+        name: "consumend_power_monthly"
+        unit_of_measurement: "kWh"
+        icon: mdi:calendar-month
+        availability: "{{ not 'unavailable' in [states('sensor.onemeter')] }}"
+        state: "{{ states.sensor.onemeter.state.split(' ')[3] | float | round(2) }}"
+        device_class: energy
+        state_class: total_increasing
+    - sensor:
+        name: "energy_cost_daily"
+        unit_of_measurement: "kWh"
+        icon: mdi:cash
+        state: "{{ (states('sensor.energy_daily') | float * states('input_number.cena_energii') | float) | round(2) }}"
+    - binary_sensor:
+        name: HA Core Update
+        state: "{{ is_state('sensor.core_updates', 'True') }}"
+utility_meter:
+  energy_daily:
+    source: sensor.onemeter_kwh
+    cycle: daily
+    
+alert:
+  # Update is available - un-acknowledgeble, auto-dismiss, me only
+  ha_update_available:
+    name: HA has an update
+    entity_id: binary_sensor.ha_core_update
+    state: 'on'
+    can_acknowledge: true
+    repeat: 360
+    title: 'Update for HA available'
+    message: "New version is {{ state_attr('sensor.core_updates', 'latest_version') }}. Currently on {{ state_attr('sensor.core_updates', 'installed_version') }}"
+    notifiers: mobile_app_s22_ultra
+    data:
+      tag: 'ha-update-available'
+      url: '/config'
+      ttl: 21600
+      actions:
+      - action: "URI"
+        title: "Update"
+        uri: "/config/updates"
+      - action: "URI"
+        title: "Release Notes"
+        uri: "https://www.home-assistant.io/latest-release-notes/"
+
+  # Supervisor update is available - un-acknowledgeable, auto-dismiss, me only
+  supervisor_update_available:
+    name: Supervisor has an update
+    entity_id: sensor.supervisor_updates
+    state: 'True'
+    can_acknowledge: true
+    repeat: 360
+    title: 'Update for HA Supervisor available'
+    message: "New version is {{ state_attr('sensor.supervisor_updates', 'latest_version') }}. Currently on {{ state_attr('sensor.supervisor_updates', 'installed_version') }}"
+    notifiers: mobile_app_s22_ultra
+    data:
+      tag: 'supervisor-update-available'
+      url: '/hassio'
+      ttl: 21600
+      actions:
+      - action: "URI"
+        title: "Update"
+        uri: "/hassio/update-available/supervisor"
+      - action: "URI"
+        title: "Release Notes"
+        uri: "https://github.com/home-assistant/supervisor/releases/latest"
+  
+  # HassOS update is available - un-acknowledgeable, auto-dismiss, me only
+  hassos_update_available:
+    name: HassOS has an update
+    entity_id: sensor.os_updates
+    state: 'True'
+    can_acknowledge: true
+    repeat: 360
+    title: 'Update for HassOS available'
+    message: "New version is {{ state_attr('sensor.os_updates', 'latest_version') }}. Currently on {{ state_attr('sensor.os_updates', 'installed_version') }}"
+    notifiers: mobile_app_s22_ultra
+    data:
+      tag: 'hassos-update-available'
+      url: '/hassio'
+      ttl: 21600
+      actions:
+      - action: "URI"
+        title: "Update"
+        uri: "/hassio"
+      - action: "URI"
+        title: "Release Notes"
+        uri: "https://github.com/home-assistant/operating-system/releases/latest"
+
+  # HACS repos have updates available - unacknowledgeable, auto-dismiss, me only
+  hacs_update_available:
+    name: HACS repos have updates
+    entity_id: binary_sensor.updater_hacs_count
+    state: 'on'
+    can_acknowledge: false
+    repeat: 360
+    title: "Update available in HACS repo{% if states('sensor.hacs') | int(0) > 1 %}s{% endif %}"
+    message: "Update available in {{ states('sensor.hacs') }} HACS repo{% if states('sensor.hacs') | int(0) > 1 %}s{% endif %}"
+    notifiers: mobile_app_s22_ultra
+    data:
+      tag: 'hacs-update-available'
+      url: '/hacs'
+      ttl: 21600

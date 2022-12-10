@@ -6,8 +6,10 @@
     minutes: /30
   condition: []
   action:
-  - service: speedtestdotnet.speedtest
+  - service: homeassistant.update_entity
     data: {}
+    target:
+      entity_id: sensor.speedtest_ping
   mode: single
 - id: '1601639212345'
   alias: '[general] Car wash notification'
@@ -20,10 +22,15 @@
     for: 00:30:00
   condition: []
   action:
-  - service: notify.mobile_app_sm_n975f
+  - service: notify.mobile_app_iphone_skipper
     data:
       message: Możesz dziś umyć samochód :)
       title: Car wash
+    enabled: true
+  - service: esphome.nspanel_1_notify_on_screensaver
+    data:
+      line1: Mozesz dzis umyc samochod :)
+      line2: Car wash
   mode: single
 - id: '1608056872531'
   alias: '[alarm] Powiadomienie z alarmu'
@@ -71,6 +78,10 @@
     entity_id: binary_sensor.0x158d00070b0d48_contact
     from: 'off'
     to: 'on'
+  - platform: state
+    entity_id: binary_sensor.0x158d0006f0b4e6_motion
+    from: 'off'
+    to: 'on'
   condition:
   - condition: state
     entity_id: alarm_control_panel.home_alarm
@@ -79,6 +90,13 @@
   - service: alarm_control_panel.alarm_trigger
     data: {}
     entity_id: alarm_control_panel.home_alarm
+  - service: esphome.nspanel_1_play_rtttl
+    data:
+      song_str: we-rock:d=4,o=6,b=355:16a#5,16c6,16a#5,16c6,16a#5,16c6,4a#5
+  - service: esphome.nspanel_1_notify_on_screensaver
+    data:
+      line1: ALARM!
+      line2: Alarm has been tripped
   mode: single
 - id: '1608557053776'
   alias: '[climate] Set thermostats, while away'
@@ -143,14 +161,16 @@
   action:
   - service: climate.set_hvac_mode
     data:
-      entity_id: climate.bf87b397ec02c5a554ywfj
       hvac_mode: auto
-    entity_id: climate.bf87b397ec02c5a554ywfj
+    target:
+      entity_id:
+      - climate.salon
   - service: climate.set_hvac_mode
     data:
-      entity_id: climate.bf859bbe3ceddf4c11t0qe
       hvac_mode: auto
-    entity_id: climate.bf859bbe3ceddf4c11t0qe
+    target:
+      entity_id:
+      - climate.sypialnia
   mode: single
 - id: '1608634442526'
   alias: '[climate] Sezon grzewczy OFF'
@@ -164,14 +184,16 @@
   action:
   - service: climate.set_hvac_mode
     data:
-      entity_id: climate.bf87b397ec02c5a554ywfj
       hvac_mode: 'off'
-    entity_id: climate.bf87b397ec02c5a554ywfj
+    target:
+      entity_id:
+      - climate.salon
   - service: climate.set_hvac_mode
     data:
-      entity_id: climate.bf859bbe3ceddf4c11t0qe
       hvac_mode: 'off'
-    entity_id: climate.bf859bbe3ceddf4c11t0qe
+    target:
+      entity_id:
+      - climate.sypialnia
   mode: single
 - id: '1610048949961'
   alias: '[climate] Wyłącz ogrzewanie bo okno'
@@ -209,7 +231,7 @@
       entity_id: automation.thermostat_schedule
   mode: single
 - id: '1610049420662'
-  alias: '[alarm] Trigger alarm (NIGHT)'
+  alias: '[alarm] Trigger alarm (HOME)'
   description: Triggerowanie alarmu z czujników
   trigger:
   - platform: state
@@ -217,13 +239,25 @@
     from: 'off'
     to: 'on'
   condition:
-  - condition: state
-    entity_id: alarm_control_panel.home_alarm
-    state: armed_night
+  - condition: or
+    conditions:
+    - condition: state
+      entity_id: alarm_control_panel.home_alarm
+      state: armed_home
+    - condition: state
+      entity_id: alarm_control_panel.home_alarm
+      state: armed_night
   action:
   - service: alarm_control_panel.alarm_trigger
     data: {}
     entity_id: alarm_control_panel.home_alarm
+  - service: esphome.nspanel_1_play_rtttl
+    data:
+      song_str: we-rock:d=4,o=6,b=355:16a#5,16c6,16a#5,16c6,16a#5,16c6,4a#5
+  - service: esphome.nspanel_1_notify_on_screensaver
+    data:
+      line1: ALARM!
+      line2: Alarm has been tripped
   mode: single
 - id: '1610054777017'
   alias: '[alarm] Zamknij drzwi'
@@ -255,7 +289,7 @@
     entity_id: sensor.ble_temperature_582d34388d0f
     below: '15'
   action:
-  - service: notify.mobile_app_sm_n975f
+  - service: notify.mobile_app_s22_ultra
     data:
       message: Balkon
       title: Zamknij balkon!
@@ -268,17 +302,19 @@
     event: sunset
   condition:
   - condition: state
-    entity_id: device_tracker.plpjarmoszko03_2
     state: home
+    entity_id: device_tracker.plpjarmoszko03_3
   action:
   - service: light.turn_on
-    data:
-      color_name: green
+    data: {}
     target:
-      device_id: cb86daddd38c338bfb2d5814f42400c1
+      entity_id:
+      - light.light_ikea_biurko
   - service: light.turn_on
     target:
-      device_id: bcf90c079247b3e877a670c465c1815c
+      entity_id: light.sonoff_1000f44d8b
+    data:
+      color_name: green
   mode: single
 - id: '1611317536093'
   alias: '[general] OneMeter notification'
@@ -292,7 +328,7 @@
     after: 08:00:00
     before: '20:00:00'
   action:
-  - service: notify.mobile_app_sm_n975f
+  - service: notify.mobile_app_s22_ultra
     data:
       message: Sprawdź odczyt OneMeter
       title: OneMeter
@@ -303,37 +339,31 @@
   mode: single
 - id: '1620640470130'
   alias: '[lights] GAME ON!'
-  description: Atmosfera do grania w PS
+  description: Atmosfera do grania
   trigger:
   - platform: state
-    entity_id: device_tracker.playstation_5
+    entity_id:
+    - sensor.ps5_718_activity
+    from: idle
+    to: playing
+  - platform: state
+    entity_id:
+    - device_tracker.desktop_6ss38pm_4
     from: not_home
     to: home
-  - platform: sun
-    event: sunset
-  condition:
-  - condition: sun
-    before: sunrise
-    after: sunset
-  - condition: device
-    device_id: 4b3db5b087017548c34c4ad5d687e9b9
-    domain: device_tracker
-    entity_id: device_tracker.playstation_5
-    type: is_home
+  - platform: state
+    entity_id:
+    - sensor.ps5_718_activity
+    from: none
+    to: playing
+  condition: []
   action:
-  - service: light.turn_on
-    target:
-      entity_id: light.sonoff_1000ee217a
-    data:
-      color_name: blue
-      brightness_pct: 80
-  - service: light.turn_on
-    target:
-      entity_id: light.sonoff_1000f44d8b
-    data:
-      color_name: blue
-      brightness_pct: 80
   - scene: scene.game_on
+  - service: light.turn_on
+    target:
+      entity_id: light.living_room_rgb
+    data:
+      color_name: blue
   mode: single
 - id: '1620834901665'
   alias: '[media] Music - pause'
@@ -353,15 +383,19 @@
   - condition: or
     conditions:
     - condition: state
-      entity_id: sensor.samsung_soundbar_q70t_media_playback_status
+      entity_id: media_player.soundbar
       state: playing
     - condition: state
-      entity_id: switch.skipper_tv
+      entity_id: media_player.samsung_tv_remote
+      state: 'on'
+    - condition: state
+      entity_id: media_player.soundbar
       state: 'on'
   action:
   - service: media_player.media_pause
     target:
       entity_id: media_player.spotify_peetereczek
+    data: {}
   mode: single
 - id: '1620835229068'
   alias: '[media] Music - play'
@@ -376,19 +410,25 @@
     entity_id: person.piotr
     zone: zone.home
   - condition: state
-    entity_id: sensor.samsung_soundbar_q70t_media_playback_status
-    state: paused
+    entity_id: media_player.spotify_peetereczek
+    state: idle
   action:
+  - service: media_player.select_source
+    data:
+      source: '[AV] Samsung Soundbar Q70T'
+    target:
+      entity_id: media_player.spotify_peetereczek
   - service: media_player.media_play
     target:
       entity_id: media_player.spotify_peetereczek
+    data: {}
   mode: single
 - id: '1620903059726'
   alias: '[lights] Turn all off while sleeping'
   description: Jeżeli telefon uważa, że spisz, wyłącz światła
   trigger:
   - platform: numeric_state
-    entity_id: sensor.sm_n975f_pewnosc_snu
+    entity_id: sensor.s22_ultra_sleep_confidence
     above: '92'
     for: 00:02:00
   condition:
@@ -400,7 +440,338 @@
     target:
       entity_id:
       - light.living_room_rgb
-      - light.0x14b457fffef67f86_light
-      - light.0xbc33acfffe6f251a
-      - light.0xd0cf5efffe32186d
+      - light.light_ikea_biurko
+      - light.light_ikea_kanapa
+      - light.light_ikea_szafkatv
+      - light.light_ikea_kuchnia
+  - service: switch.turn_off
+    target:
+      entity_id: switch.nsp01_relay_1
+  mode: single
+- id: '1641418629529'
+  alias: '[energy] TV back on'
+  description: Turn TV plug on when back at home
+  trigger:
+  - platform: zone
+    entity_id: person.piotr
+    zone: zone.home
+    event: enter
+  condition: []
+  action:
+  - delay:
+      hours: 0
+      minutes: 1
+      seconds: 0
+      milliseconds: 0
+  - condition: state
+    entity_id: person.piotr
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 50
+    state: home
+  - type: turn_on
+    device_id: cefa5c9cc54fc4bd24c4d1c58af51381
+    entity_id: switch.smart_plug_2
+    domain: switch
+  mode: single
+- id: '1641419371174'
+  alias: '[energy] Morning power back'
+  description: Przywrócenie energii przed budzikiem rano
+  trigger:
+  - platform: time
+    at: 07:00
+  condition:
+  - condition: zone
+    entity_id: person.piotr
+    zone: zone.home
+  action:
+  - type: turn_on
+    device_id: cefa5c9cc54fc4bd24c4d1c58af51381
+    entity_id: switch.smart_plug_2
+    domain: switch
+  - service: switch.turn_off
+    target:
+      entity_id: switch.nsp01_energy_saving_mode
+  mode: single
+- id: '1641657427783'
+  alias: '[lights] Automatyczne światła w kuchni'
+  description: ''
+  use_blueprint:
+    path: homeassistant/motion_light.yaml
+    input:
+      motion_entity: binary_sensor.0x158d0006f0b4e6_motion
+      light_target:
+        area_id: 37b9a152141742d6b1b279aec74532ce
+      no_motion_wait: 100
+- id: '1641659065469'
+  alias: '[climate] Run air filter'
+  description: Uruchanianie filtra powietrza
+  trigger:
+  - platform: numeric_state
+    entity_id: sensor.zhimi_airpurifier_mb3_pm2_5
+    above: '20'
+  condition: []
+  action:
+  - service: script.xiaomi_fan_speed_2
+    data: {}
+  mode: single
+- id: '1641659867591'
+  alias: '[lights] Turn automations when it''s dark'
+  description: Włącz automatyczne światła gdy zrobi się ciemno
+  trigger:
+  - platform: numeric_state
+    entity_id: sensor.0x158d0006f0b4e6_illuminance
+    below: '10'
+  - platform: sun
+    event: sunset
+    offset: '0'
+  condition: []
+  action:
+  - service: automation.turn_on
+    target:
+      entity_id:
+      - automation.za_ciemno_do_pracy
+      - automation.motion_activated_light
+      - automation.game_on
+      - automation.film
+    data: {}
+  - if:
+    - condition: state
+      entity_id: switch.ps5_718_power
+      state: 'on'
+    then:
+    - service: scene.turn_on
+      target:
+        entity_id: scene.game_on
+      metadata: {}
+    else: []
+  - if:
+    - condition: state
+      entity_id: device_tracker.desktop_6ss38pm_4
+      state: home
+    then:
+    - service: scene.turn_on
+      target:
+        entity_id: scene.game_on
+      metadata: {}
+  mode: single
+- id: '1641659964746'
+  alias: '[lights] Turn automations when sun is up'
+  description: Wyłącz automatyczne światła gdy zrobi się jasno
+  trigger:
+  - platform: numeric_state
+    entity_id: sensor.0x158d0006f0b4e6_illuminance
+    above: '10'
+  - platform: sun
+    event: sunrise
+    offset: '0'
+  condition: []
+  action:
+  - service: automation.turn_off
+    target:
+      entity_id:
+      - automation.motion_activated_light
+      - automation.za_ciemno_do_pracy
+      - automation.game_on
+      - automation.film
+    data: {}
+  - service: light.turn_off
+    target:
+      area_id:
+      - 37b9a152141742d6b1b279aec74532ce
+      entity_id: switch.sonoff_1001569b69_1
+    data: {}
+  mode: single
+- id: '1642548166005'
+  alias: '[lights] Światło na wejście'
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.0x158d000580336b_contact
+    from: 'off'
+    to: 'on'
+  condition:
+  - condition: state
+    entity_id: binary_sensor.0x158d00062f8d04_motion
+    state: 'off'
+    for:
+      hours: 0
+      minutes: 30
+      seconds: 0
+  - condition: state
+    entity_id: sun.sun
+    state: below_horizon
+  action:
+  - service: switch.turn_on
+    target:
+      entity_id: switch.nsp01_relay_1
+  mode: single
+- id: '1644068622310'
+  alias: '[climate] Stop air filter'
+  description: Zatrzymaj filtr powietrza
+  trigger:
+  - platform: numeric_state
+    entity_id: sensor.zhimi_airpurifier_mb3_pm2_5
+    below: '2'
+    for:
+      hours: 0
+      minutes: 5
+      seconds: 0
+  condition: []
+  action:
+  - service: fan.turn_off
+    data: {}
+    target:
+      device_id: 05cfa0aa8f933b54d0d34aced1a9811f
+  mode: single
+- id: '1645096839450'
+  alias: '[alarm] Alarm energy saving'
+  description: Wyłącz co się da po uzbrojeniu alarmu
+  trigger:
+  - platform: state
+    entity_id:
+    - alarm_control_panel.home_alarm
+    to: armed_away
+    from: disarmed
+  condition: []
+  action:
+  - service: light.turn_off
+    target:
+      entity_id:
+      - light.light_ikea_biurko
+      - light.light_ikea_kanapa
+      - light.light_ikea_kuchnia
+      - light.living_room_rgb
+    data: {}
+  - type: turn_off
+    device_id: cefa5c9cc54fc4bd24c4d1c58af51381
+    entity_id: switch.smart_plug_2
+    domain: switch
+  - type: turn_off
+    device_id: ca41ad9e9cb30a70b9d303597c193470
+    entity_id: switch.smart_plug_1
+    domain: switch
+  - service: switch.turn_on
+    data: {}
+    target:
+      entity_id: switch.nsp01_energy_saving_mode
+  mode: single
+- id: '1645096922620'
+  alias: '[alarm] Alarm restore power'
+  description: Włącz energię po rozbrojeniu alarmu
+  trigger:
+  - platform: state
+    entity_id: alarm_control_panel.home_alarm
+    from: armed_away
+    to: disarmed
+  condition: []
+  action:
+  - type: turn_on
+    device_id: cefa5c9cc54fc4bd24c4d1c58af51381
+    entity_id: switch.smart_plug_2
+    domain: switch
+  - type: turn_on
+    device_id: ca41ad9e9cb30a70b9d303597c193470
+    entity_id: switch.smart_plug_1
+    domain: switch
+  - service: switch.turn_off
+    data: {}
+    target:
+      entity_id: switch.nsp01_energy_saving_mode
+  mode: single
+- id: '1645354112605'
+  alias: '[alarm] Reload Xiaomi Gateway integration'
+  description: Spróbuj naprawić integrację do Xiaomi Gateway
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.0x158d000580336b_contact
+    from: 'off'
+    to: unavailable
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 30
+  condition: []
+  action:
+  - service: notify.mobile_app_s22_ultra
+    data:
+      title: Xiaomi Gateway is down, trying to reload...
+      message: Integracja do Xiaomi Gateway nie działa
+    enabled: false
+  - delay:
+      hours: 0
+      minutes: 1
+      seconds: 0
+      milliseconds: 0
+  - service: homeassistant.reload_config_entry
+    data: {}
+    target:
+      entity_id: binary_sensor.54ef44c8736a_gateway
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 30
+      milliseconds: 0
+  - service: script.xiaomi_gateway_state
+    data: {}
+  mode: parallel
+  max: 3
+- id: '1656105914668'
+  alias: '[lights] Film'
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - media_player.skipper_tv
+    from: 'off'
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 30
+  condition: []
+  action:
+  - service: scene.turn_on
+    target:
+      entity_id: scene.movie
+    metadata: {}
+  mode: single
+- id: '1669397701767'
+  alias: '[tracking] Resume Kasia position'
+  description: Fix iCloud pooling for iPhone (Kasia)
+  trigger:
+  - platform: state
+    entity_id:
+    - device_tracker.iphone_kasia_app
+    to: not_home
+  condition:
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: device_tracker.iphone_kasia
+      state: not_home
+  action:
+  - service: device_tracker.icloud3_update
+    data:
+      command: resume
+  mode: single
+- id: '1669398145330'
+  alias: '[tracking] Resume Piotr position'
+  description: Fix iCloud pooling for iPhone (Piotr)
+  trigger:
+  - platform: state
+    entity_id:
+    - device_tracker.iphone_skipper_app
+    to: not_home
+  condition:
+  - condition: not
+    conditions:
+    - condition: state
+      state: not_home
+      entity_id: device_tracker.iphone_skipper
+  action:
+  - service: device_tracker.icloud3_update
+    data:
+      command: resume
   mode: single

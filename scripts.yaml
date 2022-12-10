@@ -53,31 +53,31 @@ heating_home:
 xiaomi_fan_speed_1:
   alias: Xiaomi Fan Speed 1
   sequence:
-  - service: fan.set_speed
+  - service: fan.set_percentage
     data:
-      speed: low
+      percentage: 33
     target:
-      entity_id: fan.mi_air_purifier_3_3h
+      entity_id: fan.zhimi_airpurifier_mb3
   mode: single
   icon: mdi:fan-speed-1
 xiaomi_fan_speed_2:
   alias: Xiaomi Fan Speed 2
   sequence:
-  - service: fan.set_speed
-    target:
-      entity_id: fan.mi_air_purifier_3_3h
+  - service: fan.set_percentage
     data:
-      speed: medium
+      percentage: 66
+    target:
+      entity_id: fan.zhimi_airpurifier_mb3
   mode: single
   icon: mdi:fan-speed-2
 xiaomi_fan_speed_3:
   alias: Xiaomi Fan Speed 3
   sequence:
-  - service: fan.set_speed
+  - service: fan.set_percentage
     data:
-      speed: high
+      percentage: 100
     target:
-      entity_id: fan.mi_air_purifier_3_3h
+      entity_id: fan.zhimi_airpurifier_mb3
   mode: single
   icon: mdi:fan-speed-3
 xiaomi_fan_auto:
@@ -88,7 +88,7 @@ xiaomi_fan_auto:
       preset_mode: Auto
     target:
       entity_id:
-      - fan.mi_air_purifier_3_3h
+      - fan.zhimi_airpurifier_mb3
   mode: single
   icon: mdi:power-cycle
 xiaomi_fan_silent:
@@ -97,7 +97,7 @@ xiaomi_fan_silent:
   - service: fan.set_preset_mode
     target:
       entity_id:
-      - fan.mi_air_purifier_3_3h
+      - fan.zhimi_airpurifier_mb3
     data:
       preset_mode: Silent
   mode: single
@@ -126,3 +126,48 @@ turn_the_alarm_night:
       entity_id: alarm_control_panel.home_alarm
   mode: single
   icon: mdi:shield-home-outline
+set_light_on_rgb:
+  alias: ESPHome RGB light set
+  sequence:
+  - service: light.turn_on
+    target:
+      entity_id: '{{ entity_name }}'
+    data_template:
+      brightness: '{{ brightness }}'
+      rgb_color:
+      - '{{ red }}'
+      - '{{ green }}'
+      - '{{ blue }}'
+xiaomi_gateway_state:
+  alias: Xiaomi Gateway integration state check
+  sequence:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.54ef44c8736a_gateway
+        state: 'on'
+      sequence:
+      - service: notify.mobile_app_s22_ultra
+        data:
+          message: Wisisz mi piwo człowieku.
+          title: Xiaomi Gateway is back online!
+        enabled: false
+    - conditions:
+      - condition: state
+        entity_id: binary_sensor.54ef44c8736a_gateway
+        state: unavailable
+      sequence:
+      - service: notify.mobile_app_s22_ultra
+        data:
+          title: Xiaomi Gateway still down.
+          message: Przepraszam człowiek, musisz spojrzeć sam.
+        enabled: false
+      - service: automation.trigger
+        data:
+          skip_condition: false
+        target:
+          entity_id: automation.alarm_reload_xiomi_gateway_integration
+    default: []
+  mode: parallel
+  icon: mdi:memory
+  max: 3

@@ -1,1 +1,747 @@
-[]
+- id: '1622229114508'
+  name: Game ON!
+  entities:
+    light.light_ikea_biurko:
+      min_color_temp_kelvin: 2202
+      max_color_temp_kelvin: 4000
+      min_mireds: 250
+      max_mireds: 454
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - color_temp
+      linkquality: 255
+      power_on_behavior: 'off'
+      update:
+        state: available
+      update_available: true
+      icon: mdi:desk-lamp
+      friendly_name: Biurko
+      supported_features: 44
+      state: 'off'
+    light.light_ikea_kanapa:
+      min_color_temp_kelvin: 2202
+      max_color_temp_kelvin: 4000
+      min_mireds: 250
+      max_mireds: 454
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - color_temp
+      linkquality: 255
+      power_on_behavior: 'off'
+      update:
+        state: available
+      update_available: true
+      icon: mdi:floor-lamp
+      friendly_name: Kanapa
+      supported_features: 44
+      state: 'off'
+    light.light_ikea_szafkatv:
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - brightness
+      linkquality:
+      power_on_behavior: 'off'
+      update:
+        state: idle
+      update_available: false
+      icon: mdi:television-ambient-light
+      friendly_name: Szafka TV
+      supported_features: 44
+      state: 'off'
+    light.sonoff_1000f44d8b:
+      effect_list:
+      - Colorful
+      - Colorful Gradient
+      - Colorful Breath
+      - DIY Gradient
+      - DIY Pulse
+      - DIY Breath
+      - DIY Strobe
+      - RGB Gradient
+      - DIY Gradient
+      - RGB Breath
+      - RGB Strobe
+      - Music
+      supported_color_modes:
+      - rgb
+      icon: mdi:desk
+      friendly_name: Biurko RGB
+      supported_features: 4
+      color_mode: rgb
+      brightness: 204
+      rgb_color:
+      - 0
+      - 0
+      - 255
+      effect: Colorful
+      state: 'on'
+    light.sonoff_1000ee217a:
+      effect_list:
+      - Colorful
+      - Colorful Gradient
+      - Colorful Breath
+      - DIY Gradient
+      - DIY Pulse
+      - DIY Breath
+      - DIY Strobe
+      - RGB Gradient
+      - DIY Gradient
+      - RGB Breath
+      - RGB Strobe
+      - Music
+      supported_color_modes:
+      - rgb
+      icon: mdi:sofa
+      friendly_name: Kanapa RGB
+      supported_features: 4
+      color_mode: rgb
+      brightness: 204
+      rgb_color:
+      - 0
+      - 0
+      - 255
+      effect: Colorful
+      state: 'on'
+    light.sonoff_1001041ac0:
+      supported_color_modes:
+      - onoff
+      icon: mdi:ceiling-light
+      friendly_name: Żyrandol
+      supported_features: 0
+      state: 'off'
+  icon: mdi:sony-playstation
+  metadata: {}
+- id: '1636034288898'
+  name: Praca
+  entities:
+    light.light_ikea_biurko:
+      min_color_temp_kelvin: 2202
+      max_color_temp_kelvin: 4000
+      min_mireds: 250
+      max_mireds: 454
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - color_temp
+      linkquality: 255
+      power_on_behavior: 'on'
+      update:
+        state: available
+      update_available: true
+      icon: mdi:desk-lamp
+      friendly_name: Biurko
+      supported_features: 44
+      color_mode: color_temp
+      brightness: 127
+      color_temp_kelvin: 2202
+      color_temp: 454
+      hs_color:
+      - 29.79
+      - 84.553
+      rgb_color:
+      - 255
+      - 146
+      - 39
+      xy_color:
+      - 0.579
+      - 0.388
+      state: 'on'
+    light.light_ikea_kanapa:
+      min_color_temp_kelvin: 2202
+      max_color_temp_kelvin: 4000
+      min_mireds: 250
+      max_mireds: 454
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - color_temp
+      linkquality: 255
+      power_on_behavior: 'off'
+      update:
+        state: available
+      update_available: true
+      icon: mdi:floor-lamp
+      friendly_name: Kanapa
+      supported_features: 44
+      state: 'off'
+    light.light_ikea_szafkatv:
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - brightness
+      linkquality:
+      power_on_behavior: 'off'
+      update:
+        state: idle
+      update_available: false
+      icon: mdi:television-ambient-light
+      friendly_name: Szafka TV
+      supported_features: 44
+      state: 'off'
+    light.sonoff_1000f44d8b:
+      effect_list:
+      - Colorful
+      - Colorful Gradient
+      - Colorful Breath
+      - DIY Gradient
+      - DIY Pulse
+      - DIY Breath
+      - DIY Strobe
+      - RGB Gradient
+      - DIY Gradient
+      - RGB Breath
+      - RGB Strobe
+      - Music
+      supported_color_modes:
+      - rgb
+      icon: mdi:desk
+      friendly_name: Biurko RGB
+      supported_features: 4
+      color_mode: rgb
+      brightness: 101
+      hs_color:
+      - 120
+      - 100
+      rgb_color:
+      - 0
+      - 255
+      - 0
+      xy_color:
+      - 0.172
+      - 0.747
+      effect: Colorful
+      state: 'on'
+    light.sonoff_1000ee217a:
+      effect_list:
+      - Colorful
+      - Colorful Gradient
+      - Colorful Breath
+      - DIY Gradient
+      - DIY Pulse
+      - DIY Breath
+      - DIY Strobe
+      - RGB Gradient
+      - DIY Gradient
+      - RGB Breath
+      - RGB Strobe
+      - Music
+      supported_color_modes:
+      - rgb
+      icon: mdi:sofa
+      friendly_name: Kanapa RGB
+      supported_features: 4
+      state: 'off'
+  icon: mdi:briefcase
+  metadata: {}
+- id: '1641675464829'
+  name: Movie
+  entities:
+    light.light_ikea_biurko:
+      min_color_temp_kelvin: 2202
+      max_color_temp_kelvin: 4000
+      min_mireds: 250
+      max_mireds: 454
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - color_temp
+      linkquality: 255
+      power_on_behavior: 'off'
+      update:
+        state: available
+      update_available: true
+      icon: mdi:desk-lamp
+      friendly_name: Biurko
+      supported_features: 44
+      state: 'off'
+    light.light_ikea_kanapa:
+      min_color_temp_kelvin: 2202
+      max_color_temp_kelvin: 4000
+      min_mireds: 250
+      max_mireds: 454
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - color_temp
+      linkquality: 255
+      power_on_behavior: 'off'
+      update:
+        state: available
+      update_available: true
+      icon: mdi:floor-lamp
+      friendly_name: Kanapa
+      supported_features: 44
+      state: 'off'
+    light.light_ikea_szafkatv:
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - brightness
+      linkquality:
+      power_on_behavior: 'off'
+      update:
+        state: idle
+      update_available: false
+      icon: mdi:television-ambient-light
+      friendly_name: Szafka TV
+      supported_features: 44
+      state: 'off'
+    light.sonoff_1000f44d8b:
+      effect_list:
+      - Colorful
+      - Colorful Gradient
+      - Colorful Breath
+      - DIY Gradient
+      - DIY Pulse
+      - DIY Breath
+      - DIY Strobe
+      - RGB Gradient
+      - DIY Gradient
+      - RGB Breath
+      - RGB Strobe
+      - Music
+      supported_color_modes:
+      - rgb
+      icon: mdi:desk
+      friendly_name: Biurko RGB
+      supported_features: 4
+      color_mode: rgb
+      brightness: 204
+      rgb_color:
+      - 255
+      - 0
+      - 0
+      effect: Colorful
+      state: 'on'
+    light.sonoff_1000ee217a:
+      effect_list:
+      - Colorful
+      - Colorful Gradient
+      - Colorful Breath
+      - DIY Gradient
+      - DIY Pulse
+      - DIY Breath
+      - DIY Strobe
+      - RGB Gradient
+      - DIY Gradient
+      - RGB Breath
+      - RGB Strobe
+      - Music
+      supported_color_modes:
+      - rgb
+      icon: mdi:sofa
+      friendly_name: Kanapa RGB
+      supported_features: 4
+      color_mode: rgb
+      brightness: 204
+      rgb_color:
+      - 255
+      - 0
+      - 0
+      effect: Colorful
+      state: 'on'
+    light.rt_ax56u_led:
+      supported_color_modes:
+      - onoff
+      icon: mdi:led-off
+      friendly_name: RT-AX56U LED
+      supported_features: 0
+      state: 'off'
+    light.sonoff_1001041ac0:
+      supported_color_modes:
+      - onoff
+      icon: mdi:ceiling-light
+      friendly_name: Żyrandol
+      supported_features: 0
+      state: 'off'
+  icon: mdi:movie-filter
+  metadata: {}
+- id: '1643583901482'
+  name: Spanie
+  entities:
+    light.light_ikea_biurko:
+      min_color_temp_kelvin: 2202
+      max_color_temp_kelvin: 4000
+      min_mireds: 250
+      max_mireds: 454
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - color_temp
+      linkquality: 255
+      power_on_behavior: previous
+      update:
+        state: available
+      update_available: true
+      icon: mdi:desk-lamp
+      friendly_name: Biurko
+      supported_features: 44
+      state: 'off'
+    select.light_ikea_biurko_power_on_behavior:
+      options:
+      - 'off'
+      - previous
+      - 'on'
+      brightness: 127
+      color_mode: color_temp
+      color_temp: 388
+      linkquality: 255
+      power_on_behavior: previous
+      update:
+        state: available
+      update_available: true
+      icon: mdi:power-settings
+      friendly_name: light_ikea_biurko_power_on_behavior
+      state: previous
+    light.light_ikea_kanapa:
+      min_color_temp_kelvin: 2202
+      max_color_temp_kelvin: 4000
+      min_mireds: 250
+      max_mireds: 454
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - color_temp
+      linkquality: 255
+      power_on_behavior: 'off'
+      update:
+        state: available
+      update_available: true
+      icon: mdi:floor-lamp
+      friendly_name: Kanapa
+      supported_features: 44
+      state: 'off'
+    select.light_ikea_kanapa_power_on_behavior:
+      options:
+      - 'off'
+      - previous
+      - 'on'
+      brightness: 254
+      color_mode: color_temp
+      color_temp: 391
+      linkquality: 255
+      power_on_behavior: 'off'
+      update:
+        state: available
+      update_available: true
+      icon: mdi:power-settings
+      friendly_name: light_ikea_kanapa_power_on_behavior
+      state: 'off'
+    light.light_ikea_szafkatv:
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - brightness
+      linkquality:
+      power_on_behavior: 'off'
+      update:
+        state: idle
+      update_available: false
+      icon: mdi:television-ambient-light
+      friendly_name: Szafka TV
+      supported_features: 44
+      state: 'off'
+    select.light_ikea_szafkatv_power_on_behavior:
+      options:
+      - 'off'
+      - previous
+      - 'on'
+      brightness: 125
+      linkquality:
+      power_on_behavior: 'off'
+      update:
+        state: idle
+      update_available: false
+      icon: mdi:power-settings
+      friendly_name: light_ikea_szafkaTV_power_on_behavior
+      state: 'off'
+    light.light_ikea_kuchnia:
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - brightness
+      linkquality: 255
+      power_on_behavior: 'off'
+      update:
+        state: idle
+      update_available: false
+      icon: mdi:wall-sconce-flat
+      friendly_name: light_ikea_kuchnia
+      supported_features: 44
+      state: 'off'
+    select.light_ikea_kuchnia_power_on_behavior:
+      options:
+      - 'off'
+      - previous
+      - 'on'
+      brightness: 144
+      linkquality: 255
+      power_on_behavior: 'off'
+      update:
+        state: idle
+      update_available: false
+      icon: mdi:power-settings
+      friendly_name: light_ikea_kuchnia_power_on_behavior
+      state: 'off'
+    light.sonoff_1000ee217a:
+      effect_list:
+      - Colorful
+      - Colorful Gradient
+      - Colorful Breath
+      - DIY Gradient
+      - DIY Pulse
+      - DIY Breath
+      - DIY Strobe
+      - RGB Gradient
+      - DIY Gradient
+      - RGB Breath
+      - RGB Strobe
+      - Music
+      supported_color_modes:
+      - rgb
+      icon: mdi:sofa
+      friendly_name: Kanapa RGB
+      supported_features: 4
+      state: 'off'
+    light.sonoff_1000f44d8b:
+      effect_list:
+      - Colorful
+      - Colorful Gradient
+      - Colorful Breath
+      - DIY Gradient
+      - DIY Pulse
+      - DIY Breath
+      - DIY Strobe
+      - RGB Gradient
+      - DIY Gradient
+      - RGB Breath
+      - RGB Strobe
+      - Music
+      supported_color_modes:
+      - rgb
+      icon: mdi:desk
+      friendly_name: Biurko RGB
+      supported_features: 4
+      state: 'off'
+    light.rt_ax56u_led:
+      supported_color_modes:
+      - onoff
+      icon: mdi:led-off
+      friendly_name: RT-AX56U LED
+      supported_features: 0
+      state: 'off'
+    light.sonoff_1001041ac0:
+      supported_color_modes:
+      - onoff
+      icon: mdi:ceiling-light
+      friendly_name: Żyrandol
+      supported_features: 0
+      state: 'off'
+  icon: mdi:bed
+  metadata: {}
+- id: '1643584035151'
+  name: Wieczór
+  entities:
+    light.light_ikea_biurko:
+      min_color_temp_kelvin: 2202
+      max_color_temp_kelvin: 4000
+      min_mireds: 250
+      max_mireds: 454
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - color_temp
+      linkquality: 255
+      power_on_behavior: 'off'
+      update:
+        state: available
+      update_available: true
+      icon: mdi:desk-lamp
+      friendly_name: Biurko
+      supported_features: 44
+      color_mode: color_temp
+      brightness: 127
+      color_temp_kelvin: 2202
+      color_temp: 454
+      hs_color:
+      - 29.79
+      - 84.553
+      rgb_color:
+      - 255
+      - 146
+      - 39
+      xy_color:
+      - 0.579
+      - 0.388
+      state: 'on'
+    light.light_ikea_kanapa:
+      min_color_temp_kelvin: 2202
+      max_color_temp_kelvin: 4000
+      min_mireds: 250
+      max_mireds: 454
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - color_temp
+      linkquality: 255
+      power_on_behavior: 'on'
+      update:
+        state: available
+      update_available: true
+      icon: mdi:floor-lamp
+      friendly_name: Kanapa
+      supported_features: 44
+      color_mode: color_temp
+      brightness: 125
+      color_temp_kelvin: 2557
+      color_temp: 391
+      hs_color:
+      - 28.728
+      - 70.496
+      rgb_color:
+      - 255
+      - 161
+      - 75
+      xy_color:
+      - 0.541
+      - 0.389
+      state: 'on'
+    light.light_ikea_szafkatv:
+      effect_list:
+      - blink
+      - breathe
+      - okay
+      - channel_change
+      - finish_effect
+      - stop_effect
+      supported_color_modes:
+      - brightness
+      linkquality:
+      power_on_behavior: 'off'
+      update:
+        state: idle
+      update_available: false
+      icon: mdi:television-ambient-light
+      friendly_name: Szafka TV
+      supported_features: 44
+      state: 'off'
+    light.sonoff_1000f44d8b:
+      effect_list:
+      - Colorful
+      - Colorful Gradient
+      - Colorful Breath
+      - DIY Gradient
+      - DIY Pulse
+      - DIY Breath
+      - DIY Strobe
+      - RGB Gradient
+      - DIY Gradient
+      - RGB Breath
+      - RGB Strobe
+      - Music
+      supported_color_modes:
+      - rgb
+      icon: mdi:desk
+      friendly_name: Biurko RGB
+      supported_features: 4
+      state: 'off'
+    light.sonoff_1000ee217a:
+      effect_list:
+      - Colorful
+      - Colorful Gradient
+      - Colorful Breath
+      - DIY Gradient
+      - DIY Pulse
+      - DIY Breath
+      - DIY Strobe
+      - RGB Gradient
+      - DIY Gradient
+      - RGB Breath
+      - RGB Strobe
+      - Music
+      supported_color_modes:
+      - rgb
+      icon: mdi:sofa
+      friendly_name: Kanapa RGB
+      supported_features: 4
+      state: 'off'
+  icon: mdi:weather-night
+  metadata: {}
